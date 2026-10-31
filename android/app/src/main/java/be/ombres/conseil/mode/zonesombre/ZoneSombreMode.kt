@@ -1,5 +1,7 @@
 package be.ombres.conseil.mode.zonesombre
 
+import be.ombres.conseil.map.*
+import be.ombres.conseil.game.*
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -54,11 +56,11 @@ object ZoneSombreMode : GameMode {
 
     override suspend fun read(context: Context, screen: Screen): ReadReport {
         val st = ZsStore.load(context)
-        val reading = ZsReader.read(screen, Prefs.guild(context), st.guilds.map { it.n })
+        val reading = MapReader.read(screen, Prefs.guild(context), st.guilds.map { it.n })
         val r = merge(st, reading, Prefs.guild(context))
         var input = r.input
         val notes = r.notes.toMutableList()
-        if (reading.kind == ZsKind.MAP && reading.rooms.isNotEmpty()) {
+        if (reading.kind == ScreenKind.MAP && reading.rooms.isNotEmpty()) {
             // Part volée par les voleurs : mesurée entre cette lecture et la précédente.
             val snap = ZsSnapshot(System.currentTimeMillis(), input.guilds.map { it.r }, input.guilds.map { it.s }, reading.rooms)
             ZsStore.loadSnapshot(context)?.let { prev ->

@@ -2,6 +2,7 @@ package be.ombres.conseil.mode
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import be.ombres.conseil.mode.capitale.CapitaleMode
 import be.ombres.conseil.mode.zonesombre.ZoneSombreMode
 import be.ombres.conseil.ocr.Screen
 
@@ -30,6 +31,6 @@ interface GameMode {
 data class ReadReport(val summary: String, val missing: List<String>, val notes: List<String> = emptyList())
 
 object Modes {
-    val all: List<GameMode> = listOf(ZoneSombreMode)
+    val all: List<GameMode> = listOf(ZoneSombreMode, CapitaleMode)
     fun byId(id: String?): GameMode = all.firstOrNull { it.id == id } ?: all.first()
 }

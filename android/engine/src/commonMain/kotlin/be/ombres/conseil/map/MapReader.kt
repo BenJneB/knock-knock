@@ -1,7 +1,8 @@
-package be.ombres.conseil.mode.zonesombre
+package be.ombres.conseil.map
 
 import be.ombres.conseil.ocr.CropRequest
 import be.ombres.conseil.ocr.Filter
+import be.ombres.conseil.ocr.Hint
 import be.ombres.conseil.ocr.OcrLine
 import be.ombres.conseil.ocr.OcrPage
 import be.ombres.conseil.ocr.Screen
@@ -12,16 +13,17 @@ import be.ombres.conseil.ocr.levenshtein
 import be.ombres.conseil.ocr.median
 
 /*
- * Lecture des captures du mode Zone sombre.
+ * Lecture des captures de la carte du match (bandeau, temps, salles) et du coffre de cartes,
+ * commune aux modes qui se jouent sur cette carte (Zone sombre, Défense de la capitale).
  * 1. La capture entière est lue une fois : on y cherche des repères (« Âme », « Fin dans », « Quantité »…).
  * 2. Autour de chaque repère, la zone est relue plusieurs fois, agrandie et filtrée de façons différentes.
  * 3. Chaque valeur est choisie par vote entre ces lectures.
  * Les petits chiffres (salles, quantités) sont mal lus par ML Kit en taille réelle : d'où les filtres « texte blanc ».
  */
 
-enum class ZsKind { MAP, CHEST, UNKNOWN }
+enum class ScreenKind { MAP, CHEST, UNKNOWN }
 
-data class ZsGuildRead(
+data class GuildRead(
     val name: String?,
     val soul: String?,
     val rate: String?,
@@ -32,7 +34,7 @@ data class ZsGuildRead(
 }
 
 /** Une salle occupée repérée sur la carte, par son étiquette (nom de guilde + DMG). */
-data class ZsRoomRead(
+data class RoomRead(
     /** Colonne du bandeau de la guilde qui l'occupe ; null si le nom n'a pas été reconnu. */
     val guild: Int?,
     val dmg: String?,
@@ -46,22 +48,22 @@ data class ZsRoomRead(
 )
 
 /** Salle libre (« Efficacité en mode inactif X/s »). */
-data class ZsFreeRoom(val rate: String?, val pos: String)
+data class FreeRoom(val rate: String?, val pos: String)
 
-data class ZsReading(
-    val kind: ZsKind,
+data class MapReading(
+    val kind: ScreenKind,
     /** Les trois colonnes du bandeau, de gauche à droite ; vide si le bandeau n'est pas visible. */
-    val guilds: List<ZsGuildRead> = emptyList(),
+    val guilds: List<GuildRead> = emptyList(),
     val hours: Int? = null,
     val minutes: Int? = null,
     /** Quantités lues dans le coffre : clés em, sa, gi, ss. */
     val cards: Map<String, Int?> = emptyMap(),
     val today: Int? = null,
-    val rooms: List<ZsRoomRead> = emptyList(),
-    val free: List<ZsFreeRoom> = emptyList(),
+    val rooms: List<RoomRead> = emptyList(),
+    val free: List<FreeRoom> = emptyList(),
 )
 
-object ZsReader {
+object MapReader {
 
     val CARD_KEYS = listOf("em", "sa", "gi", "ss")
 
@@ -86,35 +88,35 @@ object ZsReader {
      * [known] : noms de guilde déjà connus par colonne (dernière lecture), et [ourGuild] notre nom ;
      * servent à reconnaître les étiquettes des salles quand un nom du bandeau est illisible.
      */
-    suspend fun read(screen: Screen, ourGuild: String? = null, known: List<String> = emptyList()): ZsReading {
+    suspend fun read(screen: Screen, ourGuild: String? = null, known: List<String> = emptyList()): MapReading {
         val page = screen.page
         val chest = chestAnchors(page)
         val banner = readBanner(screen)
         val time = readTime(screen, banner?.ameTop, banner?.unit)
         val kind = when {
-            chest.isNotEmpty() -> ZsKind.CHEST
-            banner != null -> ZsKind.MAP
-            else -> ZsKind.UNKNOWN
+            chest.isNotEmpty() -> ScreenKind.CHEST
+            banner != null -> ScreenKind.MAP
+            else -> ScreenKind.UNKNOWN
         }
         var cards: Map<String, Int?> = emptyMap()
         var today: Int? = null
-        if (kind == ZsKind.CHEST) {
+        if (kind == ScreenKind.CHEST) {
             cards = readCards(screen)
             today = readToday(screen)
         }
-        var rooms: List<ZsRoomRead> = emptyList()
-        var free: List<ZsFreeRoom> = emptyList()
-        if (kind == ZsKind.MAP && banner != null) {
+        var rooms: List<RoomRead> = emptyList()
+        var free: List<FreeRoom> = emptyList()
+        if (kind == ScreenKind.MAP && banner != null) {
             val map = readMap(screen, banner, ourGuild, known)
             rooms = map.first
             free = map.second
         }
-        return ZsReading(kind, banner?.guilds ?: emptyList(), time?.first, time?.second, cards, today, rooms, free)
+        return MapReading(kind, banner?.guilds ?: emptyList(), time?.first, time?.second, cards, today, rooms, free)
     }
 
     /* ---------- bandeau du haut ---------- */
 
-    private class Banner(val guilds: List<ZsGuildRead>, val ameTop: Int, val unit: Int, val bottom: Int)
+    private class Banner(val guilds: List<GuildRead>, val ameTop: Int, val unit: Int, val bottom: Int)
 
     private fun isAme(l: OcrLine): Boolean {
         val f = fold(l.text)
@@ -133,7 +135,7 @@ object ZsReader {
         val stripTop = ameTop - 2 * u
         val stripBottom = ameTop + (0.3 * u).toInt()
         fun band(scale: Int, f: Filter) = CropRequest(0, top, w, bottom, scale, f)
-        fun strip(scale: Int, f: Filter) = CropRequest(0, stripTop, w, stripBottom, scale, f)
+        fun strip(scale: Int, f: Filter) = CropRequest(0, stripTop, w, stripBottom, scale, f, Hint.DIGITS)
 
         val textPages = listOf(page) + listOf(
             band(2, Filter.COLOR), band(2, Filter.GRAY), band(3, Filter.COLOR), band(3, Filter.GRAY),
@@ -144,7 +146,7 @@ object ZsReader {
         ).map { screen.ocr(it) } + (0..2).flatMap { c ->
             // Une colonne à la fois, plus agrandie : aide pour les « 0 » isolés.
             listOf(Filter.WHITE200, Filter.WHITE170).map { f ->
-                screen.ocr(CropRequest(c * w / 3, stripTop, (c + 1) * w / 3, stripBottom, 4, f))
+                screen.ocr(CropRequest(c * w / 3, stripTop, (c + 1) * w / 3, stripBottom, 4, f, Hint.DIGITS))
             }
         }
 
@@ -154,7 +156,7 @@ object ZsReader {
             val name = Votes<String>()
             val soul = Votes<String>()
             val rate = Votes<String>()
-            for (p in textPages) for (e in p.elements) {
+            for (p in textPages) for (e in p.elements + p.lines) {
                 if (col(e) != c || e.bottom < top || e.top > bottom) continue
                 NAME.find(e.text)?.let { name.add(normName(it.value)) }
                 val s = SOUL.find(e.text)
@@ -175,7 +177,7 @@ object ZsReader {
                 }
                 v.best()
             }
-            ZsGuildRead(name.best(), soul.best(), rate.best(), slots)
+            GuildRead(name.best(), soul.bestMerged(), rate.best(), slots)
         }
         return Banner(guilds, ameTop, u, bottom)
     }
@@ -195,7 +197,7 @@ object ZsReader {
 
     private class Label(val left: Int, val top: Int, val bottom: Int)
 
-    private suspend fun readMap(screen: Screen, banner: Banner, ourGuild: String?, known: List<String>): Pair<List<ZsRoomRead>, List<ZsFreeRoom>> {
+    private suspend fun readMap(screen: Screen, banner: Banner, ourGuild: String?, known: List<String>): Pair<List<RoomRead>, List<FreeRoom>> {
         val page = screen.page
         val w = page.width
         val k = w / 1080.0 // mesures faites sur une capture de 1080 px de large
@@ -244,7 +246,7 @@ object ZsReader {
             val stolen = stolenVotes.best()
             val cx = lab.left + d(30)
             val cy = lab.top + d(90)
-            ZsRoomRead(guild, dmg, shield, stolen, position(cx, cy, w, mapTop, mapBottom), cx, cy)
+            RoomRead(guild, dmg, shield, stolen, position(cx, cy, w, mapTop, mapBottom), cx, cy)
         }
 
         // Salles libres : « Efficacité en mode inactif », avec la production juste en dessous.
@@ -255,7 +257,7 @@ object ZsReader {
         val free = freeLines.map { f ->
             val rate = lines.firstOrNull { it.top in f.top..f.bottom + d(45) && kotlin.math.abs(it.cx - f.cx) < d(60) && FREE_RATE.containsMatchIn(it.text) }
                 ?.let { FREE_RATE.find(it.text)!!.groupValues[1].replace(',', '.') }
-            ZsFreeRoom(rate, position(f.cx, f.cy + d(100), w, mapTop, mapBottom))
+            FreeRoom(rate, position(f.cx, f.cy + d(100), w, mapTop, mapBottom))
         }
         return rooms to free
     }
@@ -263,7 +265,7 @@ object ZsReader {
     private suspend fun readDmg(screen: Screen, lab: Label, d: (Int) -> Int): String? {
         val variants = listOf(3 to Filter.COLOR, 3 to Filter.GRAY, 4 to Filter.COLOR, 2 to Filter.COLOR, 2 to Filter.GRAY, 5 to Filter.COLOR)
         val texts = variants.flatMap { (scale, f) ->
-            screen.ocr(CropRequest(lab.left - d(10), lab.top - d(8), lab.left + d(190), lab.bottom + d(8), scale, f)).lines.map { it.text }
+            screen.ocr(CropRequest(lab.left - d(10), lab.top - d(8), lab.left + d(190), lab.bottom + d(8), scale, f, Hint.DMG)).lines.map { it.text }
         }
         return parseDmg(texts)
     }
@@ -358,7 +360,7 @@ object ZsReader {
         // Bande entière, puis chaque carte seule, plus agrandie (chiffre en partie masqué par le cadre).
         val crops = variants.map { (scale, f) -> CropRequest(0, top, page.width, bottom, scale, f) } +
             centers.flatMap { cx ->
-                listOf(Filter.WHITE170, Filter.COLOR).map { f -> CropRequest((cx - half).toInt(), top, (cx + half).toInt(), bottom, 4, f) }
+                listOf(Filter.WHITE170, Filter.COLOR).map { f -> CropRequest((cx - half).toInt(), top, (cx + half).toInt(), bottom, 4, f, Hint.DIGITS) }
             }
         for (req in crops) {
             val p = screen.ocr(req)

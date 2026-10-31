@@ -13,7 +13,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,13 +26,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,7 +45,6 @@ import be.ombres.conseil.capture.BubbleService
 import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
 import be.ombres.conseil.mode.Modes
-import be.ombres.conseil.ui.Choice
 import be.ombres.conseil.ui.ConseilTheme
 import be.ombres.conseil.ui.GameHeader
 import be.ombres.conseil.ui.Field
@@ -142,9 +146,14 @@ class MainActivity : ComponentActivity() {
                     var guild by remember { mutableStateOf(Prefs.guild(this@MainActivity)) }
                     Field("Nom de notre guilde", guild, { guild = it; Prefs.setGuild(this@MainActivity, it) }, Modifier.fillMaxWidth(), KeyboardType.Text)
                     var mode by remember { mutableStateOf(Prefs.mode(this@MainActivity)) }
-                    if (Modes.all.size > 1) Choice(Modes.all.map { it to it.title }, mode) { mode = it; Prefs.setMode(this@MainActivity, it) }
-                    Text(mode.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
-                    mode.Settings(this@MainActivity)
+                    Text("Mode de jeu", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+                    Modes.all.forEach { m ->
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { mode = m; Prefs.setMode(this@MainActivity, m) }) {
+                            RadioButton(selected = m == mode, onClick = { mode = m; Prefs.setMode(this@MainActivity, m) })
+                            Text(m.title)
+                        }
+                    }
+                    key(mode.id) { mode.Settings(this@MainActivity) }
                 }
             }
         }

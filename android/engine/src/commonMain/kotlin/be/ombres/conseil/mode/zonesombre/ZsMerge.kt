@@ -1,20 +1,10 @@
 package be.ombres.conseil.mode.zonesombre
 
-import be.ombres.conseil.ocr.fold
-import be.ombres.conseil.ocr.levenshtein
+import be.ombres.conseil.map.*
+import be.ombres.conseil.game.*
 
 /** Ce qu'une capture a apporté : les valeurs mises à jour, et un résumé pour l'utilisateur. */
 data class ZsMergeResult(val input: PlanInput, val summary: String, val missing: List<String>, val notes: List<String> = emptyList())
-
-private fun key(name: String) = fold(name).filter { it.isLetterOrDigit() }
-
-/** Vrai si [read] est vraisemblablement le nom [ours], mal lu ou non. */
-fun sameGuild(read: String, ours: String): Boolean {
-    val a = key(read)
-    val b = key(ours)
-    if (a.isEmpty() || b.isEmpty()) return false
-    return a == b || levenshtein(a, b) <= 2
-}
 
 private val CARD_NAMES = mapOf("em" to "Esprit malveillant", "sa" to "Sape d’âme", "gi" to "Garde immaculée", "ss" to "Sanctuaire sacré")
 
@@ -22,55 +12,18 @@ private val CARD_NAMES = mapOf("em" to "Esprit malveillant", "sa" to "Sape d’�
  * Reporte une lecture dans les valeurs mémorisées. Seuls les champs lus sont remplacés :
  * une valeur non lue garde sa valeur précédente, sauf si la guilde de la colonne a changé (nouveau match).
  */
-fun merge(input: PlanInput, r: ZsReading, ourGuild: String): ZsMergeResult {
+fun merge(input: PlanInput, r: MapReading, ourGuild: String): ZsMergeResult {
     var st = input
     val missing = mutableListOf<String>()
     val parts = mutableListOf<String>()
     val notes = mutableListOf<String>()
 
-    if (r.guilds.size == 3) {
-        // Sur le coffre, le bandeau est assombri et les noms souvent mal lus : seule la carte du match
-        // peut signaler un nouveau match, et les noms déjà connus y sont gardés.
-        val chest = r.kind == ZsKind.CHEST
-        val newMatch = !chest && r.guilds.indices.any { i ->
-            val n = r.guilds[i].name
-            n != null && input.guilds.getOrNull(i)?.n?.let { it.isNotEmpty() && !sameGuild(n, it) } == true
-        }
-        val guilds = r.guilds.mapIndexedTo(mutableListOf()) { i, g ->
-            val prev = if (newMatch) GuildIn() else input.guilds.getOrElse(i) { GuildIn() }
-            if (g.name == null) missing.add("nom de la guilde ${i + 1}")
-            val label = g.name ?: prev.n.ifEmpty { "guilde ${i + 1}" }
-            if (g.soul == null) missing.add("Âme de $label")
-            if (g.rate == null) missing.add("efficacité de $label")
-            if (g.rooms == null && r.kind == ZsKind.MAP) missing.add("salles de $label")
-            GuildIn(
-                n = if (chest && prev.n.isNotEmpty()) prev.n else g.name ?: prev.n,
-                a = g.soul ?: prev.a,
-                r = g.rate ?: prev.r,
-                s = g.rooms?.toString() ?: prev.s,
-            )
-        }
-        var me = guilds.indexOfFirst { sameGuild(it.n, ourGuild) }
-        if (me < 0) {
-            // Nom illisible : si une seule colonne n'a pas de nom lu, c'est sans doute la nôtre.
-            val unnamed = r.guilds.indices.filter { r.guilds[it].name == null }
-            if (unnamed.size == 1) {
-                me = unnamed[0]
-                guilds[me] = guilds[me].copy(n = ourGuild)
-                missing[missing.indexOf("nom de la guilde ${me + 1}")] = "votre guilde : supposée en colonne ${me + 1}"
-            } else missing.add("votre guilde ($ourGuild) dans le bandeau")
-        }
-        st = st.copy(guilds = guilds, me = if (me >= 0) me else st.me)
-        if (newMatch) st = st.copy(rooms = emptyList(), shield = true, free = "0")
-        parts.add("scores")
-    }
+    val banner = mergeBanner(st.guilds, st.me, r, ourGuild, missing, parts)
+    st = st.copy(guilds = banner.guilds, me = banner.me)
+    if (banner.newMatch) st = st.copy(rooms = emptyList(), shield = true, free = "0")
+    if (banner.th != null && banner.tm != null) st = st.copy(th = banner.th, tm = banner.tm)
 
-    if (r.hours != null && r.minutes != null) {
-        st = st.copy(th = r.hours.toString(), tm = r.minutes.toString())
-        parts.add("temps restant")
-    } else if (r.kind != ZsKind.UNKNOWN) missing.add("temps restant")
-
-    if (r.kind == ZsKind.CHEST) {
+    if (r.kind == ScreenKind.CHEST) {
         r.cards["em"]?.let { st = st.copy(em = it.toString()) }
         r.cards["sa"]?.let { st = st.copy(sa = it.toString()) }
         r.cards["gi"]?.let { st = st.copy(gi = it.toString()) }
@@ -80,40 +33,23 @@ fun merge(input: PlanInput, r: ZsReading, ourGuild: String): ZsMergeResult {
         parts.add("cartes")
     }
 
-    if (r.kind == ZsKind.MAP && r.guilds.size == 3) {
+    if (r.kind == ScreenKind.MAP && r.guilds.size == 3) {
         if (r.rooms.isEmpty()) missing.add("salles sur la carte")
         else {
             st = mergeRooms(st, r, notes)
             parts.add("salles")
-            missing.addAll(roomCountChecks(st, r))
+            missing.addAll(roomCountChecks(st.guilds.map { it.n }, r))
         }
     }
 
     val summary = when {
-        r.kind == ZsKind.UNKNOWN -> "Écran non reconnu : ouvrez la carte du match ou le coffre de cartes, puis réessayez."
+        r.kind == ScreenKind.UNKNOWN -> "Écran non reconnu : ouvrez la carte du match ou le coffre de cartes, puis réessayez."
         parts.isEmpty() -> "Rien n’a pu être lu sur cet écran."
-        r.kind == ZsKind.MAP -> "Carte du match lue : ${parts.joinToString(", ")}."
+        r.kind == ScreenKind.MAP -> "Carte du match lue : ${parts.joinToString(", ")}."
         else -> "Coffre de cartes lu : ${parts.joinToString(", ")}."
     }
     return ZsMergeResult(st, summary, missing, notes)
 }
-
-/**
- * Compare les salles annoncées dans le bandeau à celles vues sur la carte : une salle hors de l'écran
- * (carte défilée) ou cachée par un élément du jeu fausserait le plan sans que rien ne le signale.
- */
-fun roomCountChecks(st: PlanInput, r: ZsReading): List<String> = r.guilds.indices.mapNotNull { i ->
-    val announced = r.guilds[i].rooms ?: return@mapNotNull null
-    val seen = r.rooms.count { it.guild == i }
-    val name = short(st.guilds.getOrNull(i)?.n ?: "").ifEmpty { "guilde ${i + 1}" }
-    when {
-        seen < announced -> "$name : ${plural(announced, "salle annoncée", "salles annoncées")}, ${plural(seen, "vue", "vues")} sur la carte. Faites défiler la carte pour les voir toutes, puis relisez."
-        seen > announced -> "$name : ${plural(seen, "salle vue", "salles vues")} pour ${plural(announced, "annoncée", "annoncées")}. Vérifiez les salles du rival."
-        else -> null
-    }
-}
-
-private fun plural(n: Int, one: String, many: String) = "$n ${if (n > 1) many else one}"
 
 /** Guilde que plan() choisira comme rival (même règle : la guilde adverse qui finit le plus haut). */
 fun rivalIndex(st: PlanInput): Int? {
@@ -123,10 +59,8 @@ fun rivalIndex(st: PlanInput): Int? {
         .maxByOrNull { parseNum(st.guilds[it].a)!! + parseNum(st.guilds[it].r)!! * T }
 }
 
-private fun short(name: String) = name.substringAfter('-').ifEmpty { name }
-
 /** Salles lues sur la carte → salles du rival, bouclier de notre salle principale, salles libres. */
-private fun mergeRooms(input: PlanInput, r: ZsReading, notes: MutableList<String>): PlanInput {
+private fun mergeRooms(input: PlanInput, r: MapReading, notes: MutableList<String>): PlanInput {
     var st = input
     val ours = r.rooms.filter { it.guild == st.me }
     val best = ours.mapNotNull { parseNum(it.dmg) }.maxOrNull()

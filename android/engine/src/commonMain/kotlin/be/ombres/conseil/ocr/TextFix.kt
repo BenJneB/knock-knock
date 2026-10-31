@@ -38,6 +38,17 @@ class Votes<T> {
     private val score = LinkedHashMap<T, Double>()
     fun add(v: T?, weight: Double = 1.0) { if (v != null) score[v] = (score[v] ?: 0.0) + weight }
     fun best(): T? = score.entries.maxByOrNull { it.value }?.key
+
+    /**
+     * Comme [best], mais une valeur qui n'est que la fin d'une autre (« 28K » pour « 876.28K », nombre coupé
+     * en deux mots à la lecture) apporte ses voix à la plus longue.
+     */
+    fun bestMerged(): T? {
+        val merged = score.mapValues { (k, v) ->
+            v + score.filterKeys { o -> o != k && k.toString().endsWith(o.toString()) }.values.sum()
+        }
+        return merged.entries.maxByOrNull { it.value }?.key
+    }
 }
 
 fun median(xs: List<Int>): Int = xs.sorted()[xs.size / 2]

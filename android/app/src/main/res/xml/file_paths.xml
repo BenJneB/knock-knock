@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fichiers partageables : la dernière lecture (voir core/Analyzer). -->
+<paths>
+    <cache-path name="lecture" path="derniere-lecture/" />
+</paths>

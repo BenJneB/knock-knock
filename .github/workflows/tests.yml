@@ -1,0 +1,46 @@
+# Tests à chaque push et pull request. Gratuit : illimité sur un dépôt public,
+# dans les 2 000 minutes mensuelles offertes sur un dépôt privé (un passage prend quelques minutes).
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Tests du moteur (stratégie, lecture des captures)
+        run: ./gradlew :engine:jvmTest
+
+      - name: Moteur JavaScript de la page web
+        run: |
+          ./gradlew :engine:webPage
+          node ../tools/check-web-engine.mjs
+          git diff --exit-code -- ../web/ || { echo "Le moteur intégré à la page web n'est pas à jour : lancer ./gradlew :engine:webPage et commiter la page."; exit 1; }
+
+      - name: Appli Android
+        run: ./gradlew :app:assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: rapports-de-tests
+          path: android/engine/build/reports/tests/

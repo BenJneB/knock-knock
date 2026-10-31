@@ -1,17 +1,19 @@
 package be.ombres.conseil.mode.zonesombre
 
+import be.ombres.conseil.map.*
+import be.ombres.conseil.game.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ZsMergeTest {
 
-    private val map = ZsReading(
-        ZsKind.MAP,
+    private val map = MapReading(
+        ScreenKind.MAP,
         listOf(
-            ZsGuildRead("s18-Noxia", "724.44K", "32", listOf(0, 4, 0)),
-            ZsGuildRead("s40-0mbres", "671.54K", "32", listOf(0, 0, 1)),
-            ZsGuildRead("s43-Nexus", "538.35K", null, listOf(0, null, 0)),
+            GuildRead("s18-Noxia", "724.44K", "32", listOf(0, 4, 0)),
+            GuildRead("s40-0mbres", "671.54K", "32", listOf(0, 0, 1)),
+            GuildRead("s43-Nexus", "538.35K", null, listOf(0, null, 0)),
         ),
         hours = 4, minutes = 30,
     )
@@ -29,12 +31,12 @@ class ZsMergeTest {
     @Test
     fun unreadValuesKeepPreviousOnesInSameMatch() {
         val first = merge(PlanInput(), map, "s40-Ombres").input
-        val chest = ZsReading(
-            ZsKind.CHEST,
+        val chest = MapReading(
+            ScreenKind.CHEST,
             listOf(
-                ZsGuildRead("s18-Noxia", "795.52K", "30", listOf(null, null, null)),
-                ZsGuildRead("s40-Ombres", "776.62K", "32", listOf(null, null, null)),
-                ZsGuildRead("s43-Nexus", "590.78K", "22", listOf(null, null, null)),
+                GuildRead("s18-Noxia", "795.52K", "30", listOf(null, null, null)),
+                GuildRead("s40-Ombres", "776.62K", "32", listOf(null, null, null)),
+                GuildRead("s43-Nexus", "590.78K", "22", listOf(null, null, null)),
             ),
             hours = 3, minutes = 31, cards = mapOf("em" to 1, "sa" to 5, "gi" to null, "ss" to 4), today = 3,
         )
@@ -58,30 +60,30 @@ class ZsMergeTest {
     @Test
     fun newMatchClearsRivalRooms() {
         val first = merge(PlanInput(), map, "s40-Ombres").input.copy(rooms = listOf(RoomIn("centre")))
-        val other = map.copy(guilds = listOf(ZsGuildRead("s7-Abc", "1K", "5", listOf(0, 0, 0))) + map.guilds.drop(1))
+        val other = map.copy(guilds = listOf(GuildRead("s7-Abc", "1K", "5", listOf(0, 0, 0))) + map.guilds.drop(1))
         val r = merge(first, other, "s40-Ombres")
         assertTrue(r.input.rooms.isEmpty())
         assertEquals("", r.input.guilds[2].r)
     }
 
     // Carte « situation2 » : Noxia est le rival, notre salle principale (2.91B) a un bouclier.
-    private val map2 = ZsReading(
-        ZsKind.MAP,
+    private val map2 = MapReading(
+        ScreenKind.MAP,
         listOf(
-            ZsGuildRead("s18-Noxia", "890.78K", "21", listOf(1, 1, 0)),
-            ZsGuildRead("s40-Ombres", "828.91K", "36", listOf(0, 1, 1)),
-            ZsGuildRead("s43-Nexus", "640.46K", "30", listOf(0, 2, 0)),
+            GuildRead("s18-Noxia", "890.78K", "21", listOf(1, 1, 0)),
+            GuildRead("s40-Ombres", "828.91K", "36", listOf(0, 1, 1)),
+            GuildRead("s43-Nexus", "640.46K", "30", listOf(0, 2, 0)),
         ),
         hours = 3, minutes = 4,
         rooms = listOf(
-            ZsRoomRead(0, "0", true, "22.89K", "bas à gauche", 200, 1405),
-            ZsRoomRead(2, "863.28M", false, null, "haut au centre", 536, 877),
-            ZsRoomRead(1, "2.91B", true, null, "milieu au centre", 535, 1191),
-            ZsRoomRead(2, "57.45B", false, "21.06K", "bas au centre", 536, 1591),
-            ZsRoomRead(1, "192.63M", false, null, "haut à droite", 873, 1046),
-            ZsRoomRead(0, "3.02B", false, null, "tout en bas à droite", 848, 1795),
+            RoomRead(0, "0", true, "22.89K", "bas à gauche", 200, 1405),
+            RoomRead(2, "863.28M", false, null, "haut au centre", 536, 877),
+            RoomRead(1, "2.91B", true, null, "milieu au centre", 535, 1191),
+            RoomRead(2, "57.45B", false, "21.06K", "bas au centre", 536, 1591),
+            RoomRead(1, "192.63M", false, null, "haut à droite", 873, 1046),
+            RoomRead(0, "3.02B", false, null, "tout en bas à droite", 848, 1795),
         ),
-        free = listOf(ZsFreeRoom("4", "a"), ZsFreeRoom("3", "b"), ZsFreeRoom("4", "c"), ZsFreeRoom("2", "d")),
+        free = listOf(FreeRoom("4", "a"), FreeRoom("3", "b"), FreeRoom("4", "c"), FreeRoom("2", "d")),
     )
 
     @Test
@@ -115,12 +117,12 @@ class ZsMergeTest {
     @Test
     fun misreadNameOnChestDoesNotStartANewMatch() {
         val first = merge(PlanInput(), map2, "s40-Ombres").input
-        val chest = ZsReading(
-            ZsKind.CHEST,
+        val chest = MapReading(
+            ScreenKind.CHEST,
             listOf(
-                ZsGuildRead("s18-Noxia", "900K", "21", listOf(null, null, null)),
-                ZsGuildRead("s48-HMes", "830K", "36", listOf(null, null, null)),
-                ZsGuildRead("s43-Nexus", "650K", "30", listOf(null, null, null)),
+                GuildRead("s18-Noxia", "900K", "21", listOf(null, null, null)),
+                GuildRead("s48-HMes", "830K", "36", listOf(null, null, null)),
+                GuildRead("s43-Nexus", "650K", "30", listOf(null, null, null)),
             ),
             cards = mapOf("em" to 0, "sa" to 5, "gi" to 0, "ss" to 3), today = 0,
         )
@@ -141,7 +143,7 @@ class ZsMergeTest {
 
     @Test
     fun stolenShareIsMeasuredBetweenTwoCaptures() {
-        val nexusTop = ZsRoomRead(2, "863.23M", false, "2.91K", "haut au centre", 512, 968)
+        val nexusTop = RoomRead(2, "863.23M", false, "2.91K", "haut au centre", 512, 968)
         val prev = ZsSnapshot(0, listOf("40", "32", "36"), listOf("4", "1", "2"), listOf(nexusTop))
         // 10 min plus tard, 1.62K de plus : 1620 / 600 s = 2.7/s, pour une salle à 36 / 2 = 18/s → 15 %.
         val cur = prev.copy(time = 600_000, rooms = listOf(nexusTop.copy(stolen = "4.53K", x = 515)))

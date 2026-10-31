@@ -3,7 +3,7 @@ package be.ombres.conseil
 import android.graphics.BitmapFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import be.ombres.conseil.mode.zonesombre.ZsReader
+import be.ombres.conseil.map.MapReader
 import be.ombres.conseil.ocr.BitmapScreen
 import be.ombres.conseil.ocr.RecordingScreen
 import kotlinx.coroutines.runBlocking
@@ -26,7 +26,7 @@ class OcrDumpTest {
         for (name in assets.list("")!!.filter { it.endsWith(".jpeg") || it.endsWith(".jpg") || it.endsWith(".png") }) {
             val bmp = assets.open(name).use { BitmapFactory.decodeStream(it) }
             val screen = RecordingScreen(BitmapScreen.of(bmp))
-            val reading = ZsReader.read(screen)
+            val reading = MapReader.read(screen)
             val base = name.substringBeforeLast('.')
             File(out, "$base.json").writeText(screen.toJson().toString())
             File(out, "$base.txt").writeText(reading.toString())

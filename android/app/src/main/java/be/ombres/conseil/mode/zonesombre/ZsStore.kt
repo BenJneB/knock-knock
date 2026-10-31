@@ -1,5 +1,7 @@
 package be.ombres.conseil.mode.zonesombre
 
+import be.ombres.conseil.map.*
+import be.ombres.conseil.game.*
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,7 +25,7 @@ object ZsStore {
                 o.getLong("time"), strings("rates"), strings("roomCounts"),
                 List(rooms.length()) {
                     rooms.getJSONObject(it).run {
-                        ZsRoomRead(
+                        RoomRead(
                             if (isNull("guild")) null else getInt("guild"), optString("dmg").ifEmpty { null }, getBoolean("shield"),
                             optString("stolen").ifEmpty { null }, getString("pos"), getInt("x"), getInt("y"),
                         )

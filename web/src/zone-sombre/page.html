@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- inclure:commun/entete.html -->
+<title>Conseil de guerre – Version chefs</title>
+<style>
+/* inclure:commun/style.css */
+</style>
+</head>
+<body>
+<!-- inclure:commun/icones.svg -->
+<div class="wrap">
+  <div class="banner">
+    <svg class="door" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-door"/></svg>
+    <div><h1>Conseil de guerre</h1>
+    <p class="lead">Version chefs : envoie une capture ou entre les chiffres du match, obtiens le plan de bataille.</p></div>
+  </div>
+
+  <p class="hint">Autre mode : <a href="defense-capitale.html">Défense de la capitale</a>.</p>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg>Lire une capture</h3>
+    <p class="hint">Capture de la carte du match : les scores, les salles par guilde et le temps restant sont lus dans le navigateur (rien n’est envoyé) et reportés ci-dessous. Les salles du rival et les quantités du coffre restent à saisir : l’appli Android, elle, les lit.</p>
+    <input type="file" id="shot" accept="image/*">
+    <div id="readOut"></div>
+  </div>
+
+  <!-- inclure:commun/guildes.html -->
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hourglass"/></svg>Temps et tour</h3>
+    <div class="g3">
+      <div><label for="th">Heures</label><input type="number" id="th" inputmode="numeric" min="0"></div>
+      <div><label for="tm">Minutes</label><input type="number" id="tm" inputmode="numeric" min="0" max="59"></div>
+      <div><label for="round">Tour</label>
+        <select id="round"><option value="1">Jour 1</option><option value="2">Jour 2</option><option value="3">Jour 3</option><option value="f">Finale</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cards"/></svg>Nos cartes</h3>
+    <p class="hint">Dans le coffre : la quantité sous chaque carte, et « Disponible aujourd’hui ».</p>
+    <div class="g4">
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-spirit"/></svg><label for="em">Esprit malveillant</label><input type="number" id="em" inputmode="numeric" min="0"></div>
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-thief"/></svg><label for="sa">Sape d’âme</label><input type="number" id="sa" inputmode="numeric" min="0"></div>
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-guard"/></svg><label for="gi">Garde immaculée</label><input type="number" id="gi" inputmode="numeric" min="0"></div>
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sanctuary"/></svg><label for="ss">Sanctuaire sacré</label><input type="number" id="ss" inputmode="numeric" min="0"></div>
+    </div>
+    <div style="margin-top:10px"><label for="today">Cartes jouables aujourd’hui</label><input type="number" id="today" inputmode="numeric" min="0" max="15"></div>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-house"/></svg>Salles du rival</h3>
+    <p class="hint">Une ligne par salle de la guilde à battre. « Battable » : vos joueurs peuvent la prendre en combat.</p>
+    <div id="rooms"></div>
+    <button class="ghost" id="addRoom" type="button">Ajouter une salle</button>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg>Notre défense</h3>
+    <div class="g2">
+      <div><label for="shield">Bouclier sur notre salle principale</label>
+        <select id="shield"><option value="1">Oui</option><option value="0">Non</option></select></div>
+      <div><label for="free">Salles libres prenables</label><input type="number" id="free" inputmode="numeric" min="0"></div>
+    </div>
+    <details style="margin-top:12px">
+      <summary>Réglages avancés</summary>
+      <div class="g2" style="margin-top:10px">
+        <div><label for="freeV">Prod. d’une salle libre /s</label><input type="number" id="freeV" inputmode="decimal"></div>
+        <div><label for="sapeP">Part volée par une Sape (%)</label><input type="number" id="sapeP" inputmode="decimal"></div>
+      </div>
+      <p class="hint" style="margin-top:8px">La part volée par une Sape n’est pas indiquée par le jeu : 25 % est une estimation.</p>
+    </details>
+  </div>
+
+  <!-- inclure:commun/actions.html -->
+</div>
+
+<!-- Moteur commun (android/engine) compilé en JavaScript, puis code commun aux pages (web/src/commun/script.js). -->
+<script>
+/* inclure:engine.js */
+</script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script>
+/* inclure:commun/script.js */
+</script>
+<script>
+/* inclure:zone-sombre/script.js */
+</script>
+</body>
+</html>

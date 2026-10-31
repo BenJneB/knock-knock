@@ -3,10 +3,14 @@
 Lit l'écran de **Knock Knock: Room Defense** et propose un plan de bataille, sans IA ni connexion.
 Voir `BRIEF.md` pour le cahier des charges.
 
+Modes de jeu : **Affrontement Zone sombre** (cartes d'exorcisme, élimination) et **Défense de la capitale**
+(tentatives de défi, classement au total d'Âme ; règles : `captures/regle-capitale*.jpeg`).
+
 ```
 android/    projet Gradle : appli Android (app/) et moteur commun (engine/)
-web/        version web : conseil-zone-sombre-chefs.html, un seul fichier (moteur commun compilé en
-            JavaScript et intégré) ; lit aussi une capture de la carte (bandeau, temps) avec Tesseract.js
+web/        version web : une page par mode, chacune en un seul fichier (conseil-zone-sombre-chefs.html,
+            defense-capitale.html), assemblée depuis web/src/ ; lit aussi une capture de la carte
+            (bandeau, temps) avec Tesseract.js
 .github/    tests automatiques sur GitHub (GitHub Actions)
 captures/   captures du jeu, communes aux deux (données de test)
 tools/      scripts : comparaison des moteurs web/Android, lecture des captures sur émulateur
@@ -35,8 +39,22 @@ Stratégie, lecture des captures et fusion des valeurs lues : un seul code Kotli
 ```sh
 cd android
 ./gradlew :engine:jvmTest            # tests du moteur
-./gradlew :engine:webPage            # recompile le moteur et l'intègre dans la page web
+./gradlew :engine:webPage            # recompile le moteur et assemble les pages web
 node ../tools/check-web-engine.mjs   # vérifie la version JavaScript sur les mêmes scénarios
+```
+
+## Pages web (web/src)
+
+Les pages publiées (`web/*.html`) sont générées : modifier les sources de `web/src/` puis lancer
+`./gradlew :engine:webPage`. Un dossier par mode, et ce que les pages partagent dans `commun/` ;
+chaque page inclut ce dont elle a besoin (`/* inclure:commun/script.js */`, `<!-- inclure:commun/guildes.html -->`…).
+
+```
+web/src/
+  zone-sombre/   page.html (formulaire, verdict) + script.js   → web/conseil-zone-sombre-chefs.html
+  capitale/      page.html + script.js                          → web/defense-capitale.html
+  commun/        entete.html  style.css  icones.svg  guildes.html  actions.html
+                 script.js : mémorisation, formulaire des guildes, affichage du plan, lecture d'une capture
 ```
 
 ## Organisation de l'appli
@@ -54,16 +72,16 @@ android/app/src/main/java/be/ombres/conseil/
   core/Reminders          rappels locaux (fin d'une Sape d'âme, 2 h après)
   ui/                     thème (couleurs du jeu), en-tête, composants ; icônes dans res/drawable
   mode/GameMode.kt        interface d'un mode + liste des modes
-  mode/zonesombre/        Affrontement Zone sombre (partie Android)
-    ZsStore.kt            mémorisation des valeurs sur le téléphone
-    ZoneSombreMode.kt     écran de conseil et réglages du mode
+  mode/zonesombre/        Affrontement Zone sombre (partie Android) : mémorisation, écran de conseil
+  mode/capitale/          Défense de la capitale (partie Android) : mémorisation, écran de conseil
 
 android/engine/src/commonMain/kotlin/be/ombres/conseil/
   ocr/                    modèle du texte lu, zones à relire, vote entre lectures
+  game/                   nombres saisis ou lus (724.44K), guildes, étapes de plan
+  map/                    lecture de la carte du match (MapReader) et report du bandeau, communs aux modes
+  mode/capitale/          DcPlan (stratégie), DcMerge (report d'une lecture)
   mode/zonesombre/
     ZsPlan.kt             moteur de stratégie (plan), verdict, texte à partager
-    ZsReader.kt           lecture du bandeau, du temps restant, du coffre et des salles de la carte
-                          (étiquettes nom + DMG, bulle de bouclier par la couleur, « Volé », salles libres)
     ZsMerge.kt            report d'une lecture dans les valeurs mémorisées
     ZsHistory.kt          mesure de la part volée par un voleur entre deux captures
 ```
@@ -76,10 +94,10 @@ ajouté à `Modes.all`).
 
 - `ZsPlanGoldenTest` : 400 scénarios de référence (non-régression du moteur), vérifiés aussi sur la
   version JavaScript par `tools/check-web-engine.mjs`.
-- `ZsReaderTest` : rejoue les lectures ML Kit enregistrées sur les captures de `captures/`
+- `MapReaderTest` : rejoue les lectures ML Kit enregistrées sur les captures de `captures/`
   (les pixels, pour les boucliers, sont lus directement dans les captures).
   ML Kit ne tourne que sur Android : après avoir ajouté une capture ou modifié les zones lues,
   relancer `tools/dump-ocr.sh` avec un émulateur ou un téléphone branché.
 - Lecture ratée : sur l'écran de conseil, « Signaler une lecture ratée » partage la capture, le texte lu
   par ML Kit et le résultat. `tools/import-lecture.sh lecture-….png` les range dans `captures/` et dans
-  les tests ; il reste à écrire les valeurs attendues dans `ZsReaderTest`.
+  les tests ; il reste à écrire les valeurs attendues dans `MapReaderTest`.

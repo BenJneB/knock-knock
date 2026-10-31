@@ -1,4 +1,4 @@
-package be.ombres.conseil.mode.zonesombre
+package be.ombres.conseil.map
 
 import be.ombres.conseil.ocr.Pixels
 import be.ombres.conseil.ocr.RecordedScreen
@@ -13,7 +13,7 @@ import javax.imageio.ImageIO
  * Rejoue les lectures ML Kit enregistrées sur les captures de captures/ (tools/dump-ocr.sh),
  * avec les pixels des captures elles-mêmes (détection des boucliers).
  */
-class ZsReaderTest {
+class MapReaderTest {
 
     private fun read(name: String, ourGuild: String? = null) = runBlocking {
         val json = JSONObject(javaClass.classLoader!!.getResource("ocr/$name.json").readText())
@@ -24,21 +24,21 @@ class ZsReaderTest {
             override val height = img.height
             override fun rgb(x: Int, y: Int) = img.getRGB(x, y) and 0xFFFFFF
         }
-        ZsReader.read(RecordedScreen(json, pixels), ourGuild)
+        MapReader.read(RecordedScreen(json, pixels), ourGuild)
     }
 
     /** Salle attendue : guilde (colonne du bandeau), DMG, bouclier, montant volé. */
-    private fun rooms(r: ZsReading) = r.rooms.map { listOf(it.guild, it.dmg, it.shield, it.stolen) }.sortedBy { it.toString() }
+    private fun rooms(r: MapReading) = r.rooms.map { listOf(it.guild, it.dmg, it.shield, it.stolen) }.sortedBy { it.toString() }
 
     @Test
     fun situation() {
         val r = read("situation")
-        assertEquals(ZsKind.MAP, r.kind)
+        assertEquals(ScreenKind.MAP, r.kind)
         assertEquals(
             listOf(
-                ZsGuildRead("s18-Noxia", "724.44K", "32", listOf(0, 4, 0)),
-                ZsGuildRead("s40-Ombres", "671.54K", "32", listOf(0, 0, 1)),
-                ZsGuildRead("s43-Nexus", "538.35K", "22", listOf(0, 2, 0)),
+                GuildRead("s18-Noxia", "724.44K", "32", listOf(0, 4, 0)),
+                GuildRead("s40-Ombres", "671.54K", "32", listOf(0, 0, 1)),
+                GuildRead("s43-Nexus", "538.35K", "22", listOf(0, 2, 0)),
             ),
             r.guilds,
         )
@@ -63,7 +63,7 @@ class ZsReaderTest {
     @Test
     fun situation2() {
         val r = read("situation2")
-        assertEquals(ZsKind.MAP, r.kind)
+        assertEquals(ScreenKind.MAP, r.kind)
         assertEquals(listOf("890.78K", "828.91K", "640.46K"), r.guilds.map { it.soul })
         assertEquals(listOf("21", "36", "30"), r.guilds.map { it.rate })
         assertEquals(listOf(2, 2, 2), r.guilds.map { it.rooms })
@@ -129,7 +129,7 @@ class ZsReaderTest {
     @Test
     fun chest() {
         val r = read("cartes")
-        assertEquals(ZsKind.CHEST, r.kind)
+        assertEquals(ScreenKind.CHEST, r.kind)
         assertEquals(mapOf("em" to 1, "sa" to 5, "gi" to 1, "ss" to 4), r.cards)
         assertEquals(3, r.today)
         assertEquals(3 to 31, r.hours to r.minutes)
@@ -142,7 +142,7 @@ class ZsReaderTest {
     @Test
     fun chest2() {
         val r = read("cartes2")
-        assertEquals(ZsKind.CHEST, r.kind)
+        assertEquals(ScreenKind.CHEST, r.kind)
         assertEquals(mapOf("em" to 0, "sa" to 5, "gi" to 0, "ss" to 3), r.cards)
         assertEquals(0, r.today)
         assertEquals(listOf("890.78K", "828.91K", "640.46K"), r.guilds.map { it.soul })
@@ -150,19 +150,19 @@ class ZsReaderTest {
 
     @Test
     fun parseTime() {
-        assertEquals(4 to 30, ZsReader.parseTime("Fin dans:4h 30 min"))
-        assertEquals(3 to 31, ZsReader.parseTime("Fin dans:3 h31Nmin participants"))
-        assertEquals(0 to 45, ZsReader.parseTime("Fin dans : 45 min"))
-        assertEquals(null, ZsReader.parseTime("Fin dans3 h3mi"))
-        assertEquals(2 to 42, ZsReader.parseTime("Fin dans :2:h 42 min"))
-        assertEquals(2 to 42, ZsReader.parseTime("Fin dans:2:h, 42 min")) // Tesseract (version web)
-        assertEquals(2 to 42, ZsReader.parseTime("Fin dans :2:h.42 min partiéipanttes:"))
+        assertEquals(4 to 30, MapReader.parseTime("Fin dans:4h 30 min"))
+        assertEquals(3 to 31, MapReader.parseTime("Fin dans:3 h31Nmin participants"))
+        assertEquals(0 to 45, MapReader.parseTime("Fin dans : 45 min"))
+        assertEquals(null, MapReader.parseTime("Fin dans3 h3mi"))
+        assertEquals(2 to 42, MapReader.parseTime("Fin dans :2:h 42 min"))
+        assertEquals(2 to 42, MapReader.parseTime("Fin dans:2:h, 42 min")) // Tesseract (version web)
+        assertEquals(2 to 42, MapReader.parseTime("Fin dans :2:h.42 min partiéipanttes:"))
     }
 
     @Test
     fun dmgSeparatorMisreads() {
         // Le deux-points de « DMG : » lu comme « & » ou comme « 8 » : la valeur reste 2.91B.
-        assertEquals(listOf("2.91B", "2.91B", "863.23M"), listOf("DMG&2.91B", "DMG82.91B", "DMG:863.23M").map { ZsReader.parseDmg(listOf(it)) })
-        assertEquals("0", ZsReader.parseDmg(listOf("DMG : 0")))
+        assertEquals(listOf("2.91B", "2.91B", "863.23M"), listOf("DMG&2.91B", "DMG82.91B", "DMG:863.23M").map { MapReader.parseDmg(listOf(it)) })
+        assertEquals("0", MapReader.parseDmg(listOf("DMG : 0")))
     }
 }

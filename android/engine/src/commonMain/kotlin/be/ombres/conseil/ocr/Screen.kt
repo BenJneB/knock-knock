@@ -10,8 +10,15 @@ enum class Filter {
     WHITE200,
 }
 
+/** Ce que contient une zone, pour les moteurs de lecture qui savent s'y restreindre (Tesseract dans la page web). */
+enum class Hint { TEXT, DMG, DIGITS }
+
 /** Zone de la capture à relire, agrandie [scale] fois, en coordonnées de la capture. */
-data class CropRequest(val left: Int, val top: Int, val right: Int, val bottom: Int, val scale: Int, val filter: Filter) {
+data class CropRequest(
+    val left: Int, val top: Int, val right: Int, val bottom: Int, val scale: Int, val filter: Filter,
+    val hint: Hint = Hint.TEXT,
+) {
+    /** Identifiant de la zone (sans [hint], que ML Kit n'utilise pas : les enregistrements restent valables). */
     val key get() = "$left,$top,$right,$bottom,x$scale,$filter"
 }
 
