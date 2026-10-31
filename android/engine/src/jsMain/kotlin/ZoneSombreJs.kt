@@ -1,4 +1,4 @@
-// Point d'entrée de la page web (web/conseil-zone-sombre-chefs.html) : même moteur que l'appli Android.
+// Point d'entrée de la page web (web/src/zone-sombre/) : même moteur que l'appli Android.
 // Hors de tout paquet, pour que les fonctions soient accessibles directement : conseil.zsPlan(st).
 @file:OptIn(ExperimentalJsExport::class)
 

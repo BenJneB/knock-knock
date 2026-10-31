@@ -18,7 +18,7 @@ object Game {
     val HouseRed = Color(0xFFC8463C)
 }
 
-// Même palette que la version web (web/conseil-zone-sombre-chefs.html).
+// Même palette que la version web (web/src/commun/style.css).
 private val Light = lightColorScheme(
     primary = Color(0xFF17808C), onPrimary = Color.White,
     // « primaryContainer » : verdict difficile / mises en garde (orangé).

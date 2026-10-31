@@ -39,7 +39,7 @@ kotlin {
 }
 
 // Assemble les pages web : chaque page de web/src/ reçoit les fichiers qu'elle inclut (code commun, script du mode)
-// et le moteur compilé, et devient une page en un seul fichier dans web/ (artifact Claude, envoi par message…).
+// et le moteur compilé, et devient une page en un seul fichier dans web/dist/ (fichier généré, non versionné).
 val webPage by tasks.registering {
     val bundle = tasks.named("jsBrowserProductionWebpack")
     dependsOn(bundle)
@@ -49,7 +49,7 @@ val webPage by tasks.registering {
     val js = layout.buildDirectory.file("kotlin-webpack/js/productionExecutable/engine.js")
     inputs.file(js)
     inputs.dir(web.resolve("src"))
-    outputs.files(pages.values.map { web.resolve(it) })
+    outputs.files(pages.values.map { web.resolve("dist/$it") })
     doLast {
         val engine = js.get().asFile.readText().trim()
         // Inclusion : le moteur compilé, ou un fichier de web/src/ (commun/script.js, zone-sombre/script.js…).
@@ -59,7 +59,7 @@ val webPage by tasks.registering {
         for ((src, out) in pages) {
             val html = include.replace(web.resolve("src/$src").readText()) { m -> part(m.groupValues[1].ifEmpty { m.groupValues[2] }) }
             val note = "<!-- Page assemblée depuis web/src/$src par « ./gradlew :engine:webPage » : modifier les sources, pas ce fichier. -->"
-            web.resolve(out).writeText(html.replaceFirst("<!DOCTYPE html>\n", "<!DOCTYPE html>\n$note\n"))
+            web.resolve("dist/$out").apply { parentFile.mkdirs() }.writeText(html.replaceFirst("<!DOCTYPE html>\n", "<!DOCTYPE html>\n$note\n"))
         }
     }
 }

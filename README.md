@@ -8,9 +8,9 @@ Modes de jeu : **Affrontement Zone sombre** (cartes d'exorcisme, élimination) e
 
 ```
 android/    projet Gradle : appli Android (app/) et moteur commun (engine/)
-web/        version web : une page par mode, chacune en un seul fichier (conseil-zone-sombre-chefs.html,
-            defense-capitale.html), assemblée depuis web/src/ ; lit aussi une capture de la carte
-            (bandeau, temps) avec Tesseract.js
+web/        version web : sources dans web/src/ ; pages assemblées dans web/dist/ (générées, non versionnées :
+            une page par mode en un seul fichier, à ouvrir ou à envoyer telle quelle) ; lit aussi une capture
+            de la carte (bandeau, temps) avec Tesseract.js
 .github/    tests automatiques sur GitHub (GitHub Actions)
 captures/   captures du jeu, communes aux deux (données de test)
 tools/      scripts : comparaison des moteurs web/Android, lecture des captures sur émulateur
@@ -39,20 +39,21 @@ Stratégie, lecture des captures et fusion des valeurs lues : un seul code Kotli
 ```sh
 cd android
 ./gradlew :engine:jvmTest            # tests du moteur
-./gradlew :engine:webPage            # recompile le moteur et assemble les pages web
+./gradlew :engine:webPage            # recompile le moteur et assemble les pages web (web/dist/)
 node ../tools/check-web-engine.mjs   # vérifie la version JavaScript sur les mêmes scénarios
 ```
 
 ## Pages web (web/src)
 
-Les pages publiées (`web/*.html`) sont générées : modifier les sources de `web/src/` puis lancer
-`./gradlew :engine:webPage`. Un dossier par mode, et ce que les pages partagent dans `commun/` ;
+Les pages à utiliser (`web/dist/*.html`) sont générées par `./gradlew :engine:webPage` à partir des
+sources de `web/src/` ; elles ne sont pas versionnées. Elles sont aussi assemblées par GitHub à chaque
+push : artefact « pages-web » du passage, dans l'onglet *Actions*. Un dossier par mode, et ce que les pages partagent dans `commun/` ;
 chaque page inclut ce dont elle a besoin (`/* inclure:commun/script.js */`, `<!-- inclure:commun/guildes.html -->`…).
 
 ```
 web/src/
-  zone-sombre/   page.html (formulaire, verdict) + script.js   → web/conseil-zone-sombre-chefs.html
-  capitale/      page.html + script.js                          → web/defense-capitale.html
+  zone-sombre/   page.html (formulaire, verdict) + script.js   → web/dist/conseil-zone-sombre-chefs.html
+  capitale/      page.html + script.js                          → web/dist/defense-capitale.html
   commun/        entete.html  style.css  icones.svg  guildes.html  actions.html
                  script.js : mémorisation, formulaire des guildes, affichage du plan, lecture d'une capture
 ```

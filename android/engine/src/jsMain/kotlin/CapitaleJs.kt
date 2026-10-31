@@ -1,4 +1,4 @@
-// Point d'entrée de la page web Défense de la capitale (web/defense-capitale.html) : même moteur que l'appli.
+// Point d'entrée de la page web Défense de la capitale (web/src/capitale/) : même moteur que l'appli.
 @file:OptIn(ExperimentalJsExport::class)
 
 import be.ombres.conseil.game.GuildIn
