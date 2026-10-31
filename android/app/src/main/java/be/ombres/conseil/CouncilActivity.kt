@@ -18,6 +18,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import be.ombres.conseil.capture.BubbleService
 import be.ombres.conseil.core.Prefs
 import be.ombres.conseil.ui.ConseilTheme
 import be.ombres.conseil.ui.GameHeader
@@ -25,6 +26,16 @@ import be.ombres.conseil.ui.GameHeader
 /** Écran de conseil du mode actif : valeurs lues, plan, cartes à garder, menaces. */
 class CouncilActivity : ComponentActivity() {
     private var generation = 0
+
+    override fun onStart() {
+        super.onStart()
+        BubbleService.appScreen(+1)
+    }
+
+    override fun onStop() {
+        BubbleService.appScreen(-1)
+        super.onStop()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

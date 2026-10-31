@@ -323,22 +323,41 @@ function plan(){
   return { me, rival, T, room, margin0, margin, myR, enR, steps, threats, keep, overtake };
 }
 
+/* ---------- verdict et texte à partager (repris tels quels par l'appli Android) ---------- */
+function verdict(r){
+  const win0 = r.margin0 > 0, win = r.margin > 0;
+  const lines = [win0
+    ? `Au rythme actuel, vous finissez devant ${r.rival.n} avec ${fmt(r.margin0)} d’avance.`
+    : `Au rythme actuel, ${r.rival.n} finit devant avec ${fmt(-r.margin0)} d’avance.`];
+  if (r.steps.length) lines.push(win
+    ? `Avec le plan : vous finissez devant avec environ ${fmt(r.margin)} d’avance (${r.myR.toFixed(1)}/s contre ${r.enR.toFixed(1)}/s)${r.overtake ? `, et vous repassez devant dans ${r.overtake}` : ""}.`
+    : `Même avec le plan, il manquerait environ ${fmt(-r.margin)}. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.`);
+  return { win, title: win0 ? "En tête" : win ? "Rattrapable" : "Très difficile", lines, hint: `Estimation : une salle du rival vaut environ ${r.room.toFixed(1)}/s.` };
+}
+function emptyPlanText(r){
+  return r.margin0 > 0 ? "Rien à attaquer : tenez vos positions et économisez vos cartes." : "Aucune action possible avec les salles et cartes indiquées.";
+}
+// Plan en quelques lignes, à coller dans le chat de guilde.
+function planText(r){
+  const v = verdict(r);
+  const L = [`Conseil de guerre — Zone sombre (fin dans ${Math.floor(r.T / 3600)} h ${String(Math.floor(r.T % 3600 / 60)).padStart(2, "0")})`, `${v.title} : ${v.lines.join(" ")}`];
+  if (r.steps.length) { L.push("Plan :"); r.steps.forEach((s, i) => L.push(`${i + 1}. ${s.t}${s.c ? ` (${s.c})` : ""}`)); }
+  else L.push(emptyPlanText(r));
+  r.keep.forEach(k => L.push(`• ${k}`));
+  return L.join("\n");
+}
+
 /* ---------- render ---------- */
 $("#run").onclick = () => {
   const out = $("#out"); out.innerHTML = "";
   const r = plan();
   if (r.errs) { const e = el("div", "err"); r.errs.forEach(x => e.append(el("div", null, x))); out.append(e); out.scrollIntoView({ behavior: "smooth" }); return; }
 
-  const win0 = r.margin0 > 0, win = r.margin > 0;
-  const v = el("div", "verdict" + (win ? " win" : ""));
-  v.append(el("h2", null, win0 ? "En tête" : win ? "Rattrapable" : "Très difficile"));
-  v.append(el("p", null, win0
-    ? `Au rythme actuel, vous finissez devant ${r.rival.n} avec ${fmt(r.margin0)} d’avance.`
-    : `Au rythme actuel, ${r.rival.n} finit devant avec ${fmt(-r.margin0)} d’avance.`));
-  if (r.steps.length) v.append(el("p", null, win
-    ? `Avec le plan : vous finissez devant avec environ ${fmt(r.margin)} d’avance (${r.myR.toFixed(1)}/s contre ${r.enR.toFixed(1)}/s)${r.overtake ? `, et vous repassez devant dans ${r.overtake}` : ""}.`
-    : `Même avec le plan, il manquerait environ ${fmt(-r.margin)}. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.`));
-  v.append(el("p", "hint", `Estimation : une salle du rival vaut environ ${r.room.toFixed(1)}/s.`));
+  const vd = verdict(r);
+  const v = el("div", "verdict" + (vd.win ? " win" : ""));
+  v.append(el("h2", null, vd.title));
+  vd.lines.forEach(x => v.append(el("p", null, x)));
+  v.append(el("p", "hint", vd.hint));
   out.append(v);
 
   const b = el("div", "box"); b.append(el("h3", null, "Le plan"));
@@ -346,7 +365,15 @@ $("#run").onclick = () => {
     const ol = el("ol", "steps");
     r.steps.forEach(s => { const li = el("li"); li.append(el("strong", null, s.t), el("span", null, s.d)); if (s.c) { li.append(document.createElement("br"), tag(s.c)); } ol.append(li); });
     b.append(ol);
-  } else b.append(el("p", null, win0 ? "Rien à attaquer : tenez vos positions et économisez vos cartes." : "Aucune action possible avec les salles et cartes indiquées."));
+  } else b.append(el("p", null, emptyPlanText(r)));
+  const copy = el("button", "ghost", "Copier le plan");
+  copy.type = "button";
+  copy.onclick = async () => {
+    try { await navigator.clipboard.writeText(planText(r)); copy.textContent = "Plan copié"; }
+    catch { copy.textContent = "Copie impossible"; }
+    setTimeout(() => { copy.textContent = "Copier le plan"; }, 2000);
+  };
+  b.append(copy);
   out.append(b);
 
   [["Cartes", r.keep], ["À surveiller", r.threats]].forEach(([t, list]) => {

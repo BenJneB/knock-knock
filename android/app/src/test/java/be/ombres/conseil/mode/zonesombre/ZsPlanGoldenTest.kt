@@ -58,6 +58,7 @@ class ZsPlanGoldenTest {
             assertEquals(tag, exp.getString("title"), v.title)
             assertEquals(tag, strings(exp.getJSONArray("lines")), v.lines)
             assertEquals(tag, exp.getString("hint"), v.hint)
+            assertEquals(tag, exp.getString("text"), planText(r))
         }
     }
 }

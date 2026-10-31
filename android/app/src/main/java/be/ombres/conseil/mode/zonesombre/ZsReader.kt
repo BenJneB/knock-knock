@@ -182,7 +182,7 @@ object ZsReader {
 
     /* ---------- salles sur la carte ---------- */
 
-    private val DMG = Regex("(?i)dm[g6]\\s*[:.;]?\\s*([0-9OSA]+(?:[.,][0-9OSA]+)?)\\s*([KMB])?")
+    private val DMG = Regex("(?i)dm[g6]\\s*([:.;&,]?)\\s*([0-9OSA]+(?:[.,][0-9OSA]+)?)\\s*([KMB])?")
     private val FREE_RATE = Regex("(\\d+(?:[.,]\\d+)?)\\s*/\\s*[s5]")
 
     /** Bleu clair de la bulle de bouclier (le sol de la carte est violet : g < r). */
@@ -256,21 +256,34 @@ object ZsReader {
     }
 
     private suspend fun readDmg(screen: Screen, lab: Label, d: (Int) -> Int): String? {
-        val votes = Votes<String>()
         val variants = listOf(3 to Filter.COLOR, 3 to Filter.GRAY, 4 to Filter.COLOR, 2 to Filter.COLOR, 2 to Filter.GRAY, 5 to Filter.COLOR)
-        for ((scale, f) in variants) {
-            val p = screen.ocr(CropRequest(lab.left - d(10), lab.top - d(8), lab.left + d(190), lab.bottom + d(8), scale, f))
-            for (line in p.lines) {
-                val m = DMG.find(line.text) ?: continue
-                val num = m.groupValues[1].uppercase().replace('O', '0').replace('S', '5').replace('A', '4').replace(',', '.')
-                val unit = m.groupValues[2].uppercase()
-                when {
-                    unit.isEmpty() -> if (num == "0") votes.add("0")
-                    num.contains('.') -> votes.add(num + unit)
-                    // Point perdu à la lecture (« 141B ») : les valeurs ont deux décimales.
-                    num.length >= 3 -> votes.add(num.dropLast(2) + "." + num.takeLast(2) + unit, 0.5)
-                    else -> votes.add(num + unit, 0.5)
-                }
+        val texts = variants.flatMap { (scale, f) ->
+            screen.ocr(CropRequest(lab.left - d(10), lab.top - d(8), lab.left + d(190), lab.bottom + d(8), scale, f)).lines.map { it.text }
+        }
+        return parseDmg(texts)
+    }
+
+    /** Vote entre plusieurs lectures d'une même ligne « DMG : … ». */
+    fun parseDmg(texts: List<String>): String? {
+        val votes = Votes<String>()
+        for (text in texts) {
+            val m = DMG.find(text) ?: continue
+            var num = m.groupValues[2].uppercase().replace('O', '0').replace('S', '5').replace('A', '4').replace(',', '.')
+            val unit = m.groupValues[3].uppercase()
+            var weight = 1.0
+            // « DMG : » affiche toujours un deux-points ; sans séparateur, un 8 collé à DMG est sans doute
+            // ce deux-points mal lu (« DMG82.91B » pour 2.91B).
+            if (m.groupValues[1].isEmpty() && num.startsWith("8") && num.length > 1 && !num.startsWith("8.")) {
+                votes.add(num + unit, 0.4)
+                num = num.drop(1)
+                weight = 0.6
+            }
+            when {
+                unit.isEmpty() -> if (num == "0") votes.add("0", weight)
+                num.contains('.') -> votes.add(num + unit, weight)
+                // Point perdu à la lecture (« 141B ») : les valeurs ont deux décimales.
+                num.length >= 3 -> votes.add(num.dropLast(2) + "." + num.takeLast(2) + unit, 0.5 * weight)
+                else -> votes.add(num + unit, 0.5 * weight)
             }
         }
         return votes.best()

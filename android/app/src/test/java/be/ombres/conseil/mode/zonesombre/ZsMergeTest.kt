@@ -129,4 +129,12 @@ class ZsMergeTest {
         assertEquals("830K", r.guilds[1].a)
         assertEquals(1, r.me)
     }
+
+    @Test
+    fun announcedRoomsMissingFromTheMapAreReported() {
+        val oneHidden = map2.copy(rooms = map2.rooms.filter { it.dmg != "3.02B" })
+        val r = merge(PlanInput(), oneHidden, "s40-Ombres")
+        assertTrue(r.missing.contains("Noxia : 2 salles annoncées, 1 vue sur la carte. Faites défiler la carte pour les voir toutes, puis relisez."))
+        assertTrue(merge(PlanInput(), map2, "s40-Ombres").missing.none { "annoncées" in it })
+    }
 }

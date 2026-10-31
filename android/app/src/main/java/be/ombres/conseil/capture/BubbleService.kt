@@ -24,6 +24,7 @@ import android.os.HandlerThread
 import android.os.IBinder
 import android.os.Looper
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -33,14 +34,13 @@ import android.widget.Toast
 import be.ombres.conseil.CouncilActivity
 import be.ombres.conseil.MainActivity
 import be.ombres.conseil.R
+import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
-import be.ombres.conseil.ocr.BitmapScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
 /**
@@ -146,6 +146,12 @@ class BubbleService : Service() {
         }
         wm.addView(v, lp)
         bubble = v
+        applyAppVisible()
+    }
+
+    /** Sur nos propres écrans, la bulle ne sert à rien et cache le contenu. */
+    private fun applyAppVisible() {
+        if (!busy) bubble?.visibility = if (appScreens > 0) View.GONE else View.VISIBLE
     }
 
     private fun capture() {
@@ -168,16 +174,15 @@ class BubbleService : Service() {
 
     private fun analyze(bmp: Bitmap) = scope.launch {
         val report = try {
-            // Dernière capture gardée en cache, pour pouvoir vérifier une lecture ratée.
-            withContext(Dispatchers.IO) { java.io.File(cacheDir, "derniere-capture.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) } }
-            val screen = BitmapScreen.of(bmp)
-            Prefs.mode(this@BubbleService).read(this@BubbleService, screen)
+            Analyzer.read(this@BubbleService, bmp)
         } catch (e: Exception) {
+            Log.w("Conseil", "Lecture impossible", e)
             null
         } finally {
             bmp.recycle()
             bubble?.alpha = 1f
             busy = false
+            applyAppVisible()
         }
         if (report == null) {
             Toast.makeText(this@BubbleService, "Lecture impossible, réessayez.", Toast.LENGTH_SHORT).show()
@@ -220,12 +225,14 @@ class BubbleService : Service() {
         handler.post { latest?.close(); latest = null; reader?.close() }
         thread.quitSafely()
         running = false
+        instance = null
         super.onDestroy()
     }
 
     override fun onCreate() {
         super.onCreate()
         running = true
+        instance = this
     }
 
     companion object {
@@ -236,6 +243,15 @@ class BubbleService : Service() {
 
         @Volatile var running = false
             private set
+
+        private var instance: BubbleService? = null
+        private var appScreens = 0
+
+        /** À appeler dans onStart (+1) et onStop (-1) de nos écrans : la bulle s'y cache. */
+        fun appScreen(delta: Int) {
+            appScreens = (appScreens + delta).coerceAtLeast(0)
+            instance?.applyAppVisible()
+        }
 
         fun start(c: Context, resultCode: Int, data: Intent) {
             c.startForegroundService(Intent(c, BubbleService::class.java).putExtra(EXTRA_CODE, resultCode).putExtra(EXTRA_DATA, data))

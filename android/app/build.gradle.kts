@@ -16,9 +16,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Un APK par type de processeur : le moteur de lecture de ML Kit pèse ~11 Mo par type.
+    // Pour un téléphone : app-arm64-v8a-release.apk (presque tous les téléphones depuis 2017),
+    // app-armeabi-v7a-release.apk pour les plus anciens ; x86_64 sert à l'émulateur.
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             // APK installé hors Play Store : signé avec la clé de debug tant qu'aucune clé n'est fournie.
             signingConfig = signingConfigs.getByName("debug")
         }

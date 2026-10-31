@@ -5,7 +5,7 @@
 set -e
 cd "$(dirname "$0")/../android"
 ./gradlew -q :app:assembleDebug :app:assembleDebugAndroidTest
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb install -r app/build/outputs/apk/debug/app-universal-debug.apk
 adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 adb shell am instrument -w -e class be.ombres.conseil.OcrDumpTest be.ombres.conseil.test/androidx.test.runner.AndroidJUnitRunner
 mkdir -p app/src/test/resources/ocr

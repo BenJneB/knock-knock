@@ -1,6 +1,10 @@
 package be.ombres.conseil.mode.zonesombre
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import be.ombres.conseil.R
+import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
 import be.ombres.conseil.ui.Art
 import be.ombres.conseil.mode.GameMode
@@ -72,14 +77,15 @@ object ZoneSombreMode : GameMode {
                 Text("À vérifier ou saisir :", fontWeight = FontWeight.Bold)
                 Bullets(report.missing)
             }
+            if (Analyzer.hasLast(context)) OutlinedButton(onClick = { Analyzer.shareLast(context) }) { Text("Signaler une lecture ratée") }
         }
 
-        PlanView(plan(st))
+        PlanView(context, plan(st))
         Inputs(st, ::upd)
     }
 
     @Composable
-    private fun PlanView(r: PlanResult) {
+    private fun PlanView(context: Context, r: PlanResult) {
         if (r is PlanErrors) {
             Section("Il manque des valeurs", R.drawable.ic_eye, MaterialTheme.colorScheme.tertiaryContainer) { Bullets(r.errs) }
             return
@@ -93,6 +99,7 @@ object ZoneSombreMode : GameMode {
         Section("Le plan", R.drawable.ic_bubble) {
             if (r.steps.isEmpty()) Text(emptyPlanText(r))
             else Column { r.steps.forEachIndexed { i, s -> NumberedStep(i + 1, s.t, s.d, s.c) } }
+            OutlinedButton(onClick = { copyPlan(context, r) }) { Text("Copier le plan") }
         }
         if (r.keep.isNotEmpty()) Section("Cartes", R.drawable.ic_cards) { Bullets(r.keep) }
         if (r.threats.isNotEmpty()) Section("À surveiller", R.drawable.ic_eye) { Bullets(r.threats) }
@@ -166,5 +173,13 @@ object ZoneSombreMode : GameMode {
             Art(icon, 34)
             Field(label, value, onChange, Modifier.fillMaxWidth())
         }
+    }
+
+    /** Copie le plan en texte, à coller dans le chat de guilde. */
+    private fun copyPlan(context: Context, r: PlanOk) {
+        val cm = context.getSystemService(ClipboardManager::class.java)
+        cm.setPrimaryClip(ClipData.newPlainText("Plan de bataille", planText(r)))
+        // Depuis Android 13, le système confirme lui-même la copie.
+        if (Build.VERSION.SDK_INT < 33) Toast.makeText(context, "Plan copié : collez-le dans le chat de guilde.", Toast.LENGTH_SHORT).show()
     }
 }

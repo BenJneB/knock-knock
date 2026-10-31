@@ -15,15 +15,16 @@ import javax.imageio.ImageIO
  */
 class ZsReaderTest {
 
-    private fun read(name: String) = runBlocking {
+    private fun read(name: String, ourGuild: String? = null) = runBlocking {
         val json = JSONObject(javaClass.classLoader!!.getResource("ocr/$name.json").readText())
-        val img = ImageIO.read(File("../../captures/$name.jpeg"))
+        val file = listOf("jpeg", "jpg", "png").map { File("../../captures/$name.$it") }.first { it.exists() }
+        val img = ImageIO.read(file)
         val pixels = object : Pixels {
             override val width = img.width
             override val height = img.height
             override fun rgb(x: Int, y: Int) = img.getRGB(x, y) and 0xFFFFFF
         }
-        ZsReader.read(RecordedScreen(json, pixels))
+        ZsReader.read(RecordedScreen(json, pixels), ourGuild)
     }
 
     /** Salle attendue : guilde (colonne du bandeau), DMG, bouclier, montant volé. */
@@ -104,6 +105,27 @@ class ZsReaderTest {
         assertEquals(listOf("2", "3", "3", "2", null), r.free.map { it.rate })
     }
 
+    /** Même carte que situation3, capturée par la bulle par-dessus une visionneuse photo (signalée depuis l'appli). */
+    @Test
+    fun bubbleCaptureOfSituation3() {
+        val r = read("lecture-20261031-230804", ourGuild = "s40-Ombres")
+        // Notre nom est caché par l'heure de la visionneuse : nos salles sont reconnues grâce au nom réglé.
+        assertEquals(listOf("s18-Noxia", null, "s43-Nexus"), r.guilds.map { it.name })
+        assertEquals(2 to 42, r.hours to r.minutes)
+        assertEquals(
+            listOf(
+                listOf(0, "1.89B", false, null),
+                listOf(0, "7.48B", false, null),
+                listOf(0, "881.11M", true, null),
+                listOf(0, "355.18M", true, null),
+                listOf(1, "2.91B", true, null), // « DMG&2.91B » : deux-points lu comme « & »
+                listOf(2, "863.28M", false, "2.91K"),
+                listOf(2, "57.45B", false, null),
+            ).sortedBy { it.toString() },
+            rooms(r),
+        )
+    }
+
     @Test
     fun chest() {
         val r = read("cartes")
@@ -133,5 +155,12 @@ class ZsReaderTest {
         assertEquals(0 to 45, ZsReader.parseTime("Fin dans : 45 min"))
         assertEquals(null, ZsReader.parseTime("Fin dans3 h3mi"))
         assertEquals(2 to 42, ZsReader.parseTime("Fin dans :2:h 42 min"))
+    }
+
+    @Test
+    fun dmgSeparatorMisreads() {
+        // Le deux-points de « DMG : » lu comme « & » ou comme « 8 » : la valeur reste 2.91B.
+        assertEquals(listOf("2.91B", "2.91B", "863.23M"), listOf("DMG&2.91B", "DMG82.91B", "DMG:863.23M").map { ZsReader.parseDmg(listOf(it)) })
+        assertEquals("0", ZsReader.parseDmg(listOf("DMG : 0")))
     }
 }

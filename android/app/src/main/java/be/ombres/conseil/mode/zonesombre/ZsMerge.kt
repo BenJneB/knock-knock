@@ -85,6 +85,7 @@ fun merge(input: PlanInput, r: ZsReading, ourGuild: String): ZsMergeResult {
         else {
             st = mergeRooms(st, r, notes)
             parts.add("salles")
+            missing.addAll(roomCountChecks(st, r))
         }
     }
 
@@ -96,6 +97,23 @@ fun merge(input: PlanInput, r: ZsReading, ourGuild: String): ZsMergeResult {
     }
     return ZsMergeResult(st, summary, missing, notes)
 }
+
+/**
+ * Compare les salles annoncées dans le bandeau à celles vues sur la carte : une salle hors de l'écran
+ * (carte défilée) ou cachée par un élément du jeu fausserait le plan sans que rien ne le signale.
+ */
+fun roomCountChecks(st: PlanInput, r: ZsReading): List<String> = r.guilds.indices.mapNotNull { i ->
+    val announced = r.guilds[i].rooms ?: return@mapNotNull null
+    val seen = r.rooms.count { it.guild == i }
+    val name = short(st.guilds.getOrNull(i)?.n ?: "").ifEmpty { "guilde ${i + 1}" }
+    when {
+        seen < announced -> "$name : ${plural(announced, "salle annoncée", "salles annoncées")}, ${plural(seen, "vue", "vues")} sur la carte. Faites défiler la carte pour les voir toutes, puis relisez."
+        seen > announced -> "$name : ${plural(seen, "salle vue", "salles vues")} pour ${plural(announced, "annoncée", "annoncées")}. Vérifiez les salles du rival."
+        else -> null
+    }
+}
+
+private fun plural(n: Int, one: String, many: String) = "$n ${if (n > 1) many else one}"
 
 /** Guilde que plan() choisira comme rival (même règle : la guilde adverse qui finit le plus haut). */
 fun rivalIndex(st: PlanInput): Int? {

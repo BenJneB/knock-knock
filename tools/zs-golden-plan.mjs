@@ -6,7 +6,7 @@ import fs from "node:fs";
 const html = fs.readFileSync(new URL("../web/conseil-zone-sombre-chefs.html", import.meta.url), "utf8");
 const script = html.split("<script>")[1].split("</script>")[0];
 const engine = script.slice(script.indexOf("/* ---------- helpers"), script.indexOf("/* ---------- render"));
-const make = new Function("st", engine.replace(/function el\(.*\n/, "") + "\nreturn { plan, fmt };");
+const make = new Function("st", engine.replace(/function el\(.*\n/, "") + "\nreturn { plan, verdict, planText };");
 
 let seed = 12345;
 const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
@@ -26,19 +26,15 @@ for (let k = 0; k < 400; k++) {
     rooms: Array.from({ length: Math.floor(rnd() * 6) }, () => ({ n: pick(["", "haut gauche", "centre", "bas"]), sh: pick(["0", "1"]), b: pick(["0", "1"]) })),
     shield: pick(["0", "1"]), free: pick(["0", n(0, 3)]), freeV: pick(["3", "2", "", "2.5"]), sapeP: pick(["25", "40", ""]),
   };
-  const { plan, fmt } = make(st);
+  const { plan, verdict, planText } = make(st);
   const r = plan();
   let out;
   if (r.errs) out = { errs: r.errs };
   else {
-    const win0 = r.margin0 > 0, win = r.margin > 0;
-    const lines = [win0 ? `Au rythme actuel, vous finissez devant ${r.rival.n} avec ${fmt(r.margin0)} d’avance.` : `Au rythme actuel, ${r.rival.n} finit devant avec ${fmt(-r.margin0)} d’avance.`];
-    if (r.steps.length) lines.push(win
-      ? `Avec le plan : vous finissez devant avec environ ${fmt(r.margin)} d’avance (${r.myR.toFixed(1)}/s contre ${r.enR.toFixed(1)}/s)${r.overtake ? `, et vous repassez devant dans ${r.overtake}` : ""}.`
-      : `Même avec le plan, il manquerait environ ${fmt(-r.margin)}. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.`);
+    const v = verdict(r);
     out = { rival: r.rival.n, T: r.T, room: r.room, margin0: r.margin0, margin: r.margin, myR: r.myR, enR: r.enR,
       steps: r.steps, threats: r.threats, keep: r.keep, overtake: r.overtake,
-      title: win0 ? "En tête" : win ? "Rattrapable" : "Très difficile", lines, hint: `Estimation : une salle du rival vaut environ ${r.room.toFixed(1)}/s.` };
+      title: v.title, lines: v.lines, hint: v.hint, text: planText(r) };
   }
   cases.push({ st, out });
 }

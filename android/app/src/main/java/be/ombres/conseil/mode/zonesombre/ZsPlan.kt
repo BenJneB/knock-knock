@@ -247,3 +247,18 @@ fun verdict(r: PlanOk): Verdict {
 fun emptyPlanText(r: PlanOk): String =
     if (r.margin0 > 0) "Rien à attaquer : tenez vos positions et économisez vos cartes."
     else "Aucune action possible avec les salles et cartes indiquées."
+
+/** Plan en quelques lignes, à coller dans le chat de guilde (même texte que planText() en JS). */
+fun planText(r: PlanOk): String {
+    val v = verdict(r)
+    val lines = mutableListOf(
+        "Conseil de guerre — Zone sombre (fin dans ${r.T / 3600} h ${(r.T % 3600 / 60).toString().padStart(2, '0')})",
+        "${v.title} : ${v.lines.joinToString(" ")}",
+    )
+    if (r.steps.isNotEmpty()) {
+        lines.add("Plan :")
+        r.steps.forEachIndexed { i, s -> lines.add("${i + 1}. ${s.t}${if (s.c.isNotEmpty()) " (${s.c})" else ""}") }
+    } else lines.add(emptyPlanText(r))
+    r.keep.forEach { lines.add("• $it") }
+    return lines.joinToString("\n")
+}

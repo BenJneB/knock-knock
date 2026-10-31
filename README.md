@@ -17,9 +17,13 @@ JDK : celui d'Android Studio (`/snap/android-studio/current/jbr`).
 ```sh
 cd android
 export JAVA_HOME=/snap/android-studio/current/jbr
-./gradlew :app:assembleDebug          # APK : android/app/build/outputs/apk/debug/app-debug.apk
+./gradlew :app:assembleRelease        # APK à installer : android/app/build/outputs/apk/release/app-arm64-v8a-release.apk
+./gradlew :app:assembleDebug          # version de développement (app-universal-debug.apk : tous processeurs)
 ./gradlew :app:testDebugUnitTest      # tests JVM (moteur + lecture)
 ```
+
+Un APK par type de processeur : `arm64-v8a` pour presque tous les téléphones (≈ 14 Mo),
+`armeabi-v7a` pour les plus anciens, `x86_64` pour l'émulateur, `universal` pour tous (≈ 44 Mo).
 
 ## Organisation de l'appli
 
@@ -32,6 +36,7 @@ android/app/src/main/java/be/ombres/conseil/
   capture/BubbleService   bulle flottante + MediaProjection
   ocr/                    ML Kit, découpe/agrandissement des zones, vote entre lectures
   core/Prefs              réglages communs (nom de la guilde, mode actif)
+  core/Analyzer           lecture d'une capture par le mode actif, gardée pour « Signaler une lecture ratée »
   ui/                     thème (couleurs du jeu), en-tête, composants ; icônes dans res/drawable
   mode/GameMode.kt        interface d'un mode + liste des modes
   mode/zonesombre/        Affrontement Zone sombre
@@ -53,5 +58,6 @@ Ajouter un mode (ex. Défense de la capitale) : créer `mode/<nom>/` avec un obj
   (les pixels, pour les boucliers, sont lus directement dans les captures).
   ML Kit ne tourne que sur Android : après avoir ajouté une capture ou modifié les zones lues,
   relancer `tools/dump-ocr.sh` avec un émulateur ou un téléphone branché.
-- La dernière capture prise par la bulle est gardée dans le cache de l'appli
-  (`adb exec-out run-as be.ombres.conseil cat cache/derniere-capture.png > capture.png`).
+- Lecture ratée : sur l'écran de conseil, « Signaler une lecture ratée » partage la capture, le texte lu
+  par ML Kit et le résultat. `tools/import-lecture.sh lecture-….png` les range dans `captures/` et dans
+  les tests ; il reste à écrire les valeurs attendues dans `ZsReaderTest`.

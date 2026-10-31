@@ -37,9 +37,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import be.ombres.conseil.capture.BubbleService
+import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
 import be.ombres.conseil.mode.Modes
-import be.ombres.conseil.ocr.BitmapScreen
 import be.ombres.conseil.ui.Choice
 import be.ombres.conseil.ui.ConseilTheme
 import be.ombres.conseil.ui.GameHeader
@@ -68,6 +68,16 @@ class MainActivity : ComponentActivity() {
     private val notifications = registerForActivityResult(ActivityResultContracts.RequestPermission()) { askProjection() }
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri -> uri?.let(::readImage) }
+
+    override fun onStart() {
+        super.onStart()
+        BubbleService.appScreen(+1)
+    }
+
+    override fun onStop() {
+        BubbleService.appScreen(-1)
+        super.onStop()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,7 +108,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val report = runCatching {
                 val bmp = withContext(Dispatchers.IO) { contentResolver.openInputStream(uri)!!.use { BitmapFactory.decodeStream(it) } }
-                Prefs.mode(this@MainActivity).read(this@MainActivity, BitmapScreen.of(bmp))
+                Analyzer.read(this@MainActivity, bmp)
             }.getOrNull()
             reading = false
             if (report == null) { Toast.makeText(this@MainActivity, "Image illisible.", Toast.LENGTH_SHORT).show(); return@launch }
