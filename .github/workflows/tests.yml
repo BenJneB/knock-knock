@@ -30,11 +30,16 @@ jobs:
       - name: Tests du moteur (stratégie, lecture des captures)
         run: ./gradlew :engine:jvmTest
 
-      - name: Moteur JavaScript de la page web
+      - name: Pages web (moteur JavaScript)
         run: |
           ./gradlew :engine:webPage
           node ../tools/check-web-engine.mjs
-          git diff --exit-code -- ../web/ || { echo "Le moteur intégré à la page web n'est pas à jour : lancer ./gradlew :engine:webPage et commiter la page."; exit 1; }
+
+      # Pages web assemblées (un fichier par mode), téléchargeables depuis l'onglet Actions.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pages-web
+          path: web/dist/
 
       - name: Appli Android
         run: ./gradlew :app:assembleDebug
