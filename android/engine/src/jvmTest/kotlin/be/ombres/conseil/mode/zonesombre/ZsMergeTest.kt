@@ -97,6 +97,7 @@ class ZsMergeTest {
         )
         assertTrue(r.input.shield)
         assertEquals("4", r.input.free)
+        assertEquals("3.3", r.input.freeV) // moyenne de 4, 3, 4 et 2 /s lus sur la carte
         assertEquals("Carte du match lue : scores, temps restant, salles.", r.summary)
         assertTrue(r.notes.contains("Salles libres : 4 (4/s, 3/s, 4/s, 2/s)."))
         assertTrue(r.notes.contains("« Battable » est estimé : DMG inférieur à celui de votre meilleure salle (2.91B). Corrigez si besoin."))
@@ -136,5 +137,18 @@ class ZsMergeTest {
         val r = merge(PlanInput(), oneHidden, "s40-Ombres")
         assertTrue(r.missing.contains("Noxia : 2 salles annoncées, 1 vue sur la carte. Faites défiler la carte pour les voir toutes, puis relisez."))
         assertTrue(merge(PlanInput(), map2, "s40-Ombres").missing.none { "annoncées" in it })
+    }
+
+    @Test
+    fun stolenShareIsMeasuredBetweenTwoCaptures() {
+        val nexusTop = ZsRoomRead(2, "863.23M", false, "2.91K", "haut au centre", 512, 968)
+        val prev = ZsSnapshot(0, listOf("40", "32", "36"), listOf("4", "1", "2"), listOf(nexusTop))
+        // 10 min plus tard, 1.62K de plus : 1620 / 600 s = 2.7/s, pour une salle à 36 / 2 = 18/s → 15 %.
+        val cur = prev.copy(time = 600_000, rooms = listOf(nexusTop.copy(stolen = "4.53K", x = 515)))
+        val m = measureSape(prev, cur)
+        assertEquals(1, m.size)
+        assertEquals(0.15, m[0].share, 1e-9)
+        assertEquals("15", measuredSapePercent(m))
+        assertTrue(measureSape(prev, cur.copy(time = 60_000)).isEmpty()) // trop rapproché
     }
 }

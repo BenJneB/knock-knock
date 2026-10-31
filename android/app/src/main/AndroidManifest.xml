@@ -37,6 +37,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <receiver
+            android:name=".core.ReminderReceiver"
+            android:exported="false" />
+
         <service
             android:name=".capture.BubbleService"
             android:exported="false"

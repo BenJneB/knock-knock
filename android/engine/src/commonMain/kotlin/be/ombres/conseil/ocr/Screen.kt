@@ -1,7 +1,5 @@
 package be.ombres.conseil.ocr
 
-import org.json.JSONObject
-
 /** Traitement appliqué à une zone avant la lecture. */
 enum class Filter {
     COLOR,
@@ -51,27 +49,3 @@ fun OcrPage.fromCrop(req: CropRequest, full: OcrPage): OcrPage {
     fun OcrLine.map() = OcrLine(text, req.left + left / req.scale, req.top + top / req.scale, req.left + right / req.scale, req.top + bottom / req.scale)
     return OcrPage(full.width, full.height, lines.map { it.map() }, elements.map { it.map() })
 }
-
-/** Enregistre tout ce qui a été lu, pour rejouer la lecture dans les tests JVM. */
-class RecordingScreen(private val inner: Screen) : Screen {
-    override val page get() = inner.page
-    override val pixels get() = inner.pixels
-    private val crops = LinkedHashMap<String, OcrPage>()
-
-    override suspend fun ocr(req: CropRequest): OcrPage = inner.ocr(req).also { crops[req.key] = it }
-
-    fun toJson(): JSONObject = JSONObject()
-        .put("page", page.toJson())
-        .put("crops", JSONObject().apply { crops.forEach { (k, v) -> put(k, v.toJson()) } })
-}
-
-/** Rejoue un enregistrement de [RecordingScreen] ; les pixels viennent de la capture d'origine. */
-class RecordedScreen(json: JSONObject, override val pixels: Pixels) : Screen {
-    override val page = ocrPageFromJson(json.getJSONObject("page"))
-    private val crops = json.getJSONObject("crops")
-
-    override suspend fun ocr(req: CropRequest): OcrPage =
-        if (crops.has(req.key)) ocrPageFromJson(crops.getJSONObject(req.key))
-        else error("Zone non enregistrée : ${req.key} (relancer tools/dump-ocr.sh)")
-}
-

@@ -13,6 +13,35 @@ object ZsStore {
 
     fun save(c: Context, st: PlanInput) = sp(c).edit().putString("input", toJson(st).toString()).apply()
 
+    /** Dernière lecture de la carte, pour mesurer la part volée par les voleurs à la lecture suivante. */
+    fun loadSnapshot(c: Context): ZsSnapshot? = sp(c).getString("snapshot", null)?.let { s ->
+        runCatching {
+            val o = JSONObject(s)
+            fun strings(k: String) = o.getJSONArray(k).let { a -> List(a.length()) { a.getString(it) } }
+            val rooms = o.getJSONArray("rooms")
+            ZsSnapshot(
+                o.getLong("time"), strings("rates"), strings("roomCounts"),
+                List(rooms.length()) {
+                    rooms.getJSONObject(it).run {
+                        ZsRoomRead(
+                            if (isNull("guild")) null else getInt("guild"), optString("dmg").ifEmpty { null }, getBoolean("shield"),
+                            optString("stolen").ifEmpty { null }, getString("pos"), getInt("x"), getInt("y"),
+                        )
+                    }
+                },
+            )
+        }.getOrNull()
+    }
+
+    fun saveSnapshot(c: Context, snap: ZsSnapshot) = sp(c).edit().putString(
+        "snapshot",
+        JSONObject().put("time", snap.time).put("rates", JSONArray(snap.rates)).put("roomCounts", JSONArray(snap.roomCounts))
+            .put("rooms", JSONArray(snap.rooms.map {
+                JSONObject().put("guild", it.guild ?: JSONObject.NULL).put("dmg", it.dmg ?: "").put("shield", it.shield)
+                    .put("stolen", it.stolen ?: "").put("pos", it.pos).put("x", it.x).put("y", it.y)
+            })).toString(),
+    ).apply()
+
     fun toJson(st: PlanInput): JSONObject = JSONObject()
         .put("guilds", JSONArray(st.guilds.map { JSONObject().put("n", it.n).put("a", it.a).put("r", it.r).put("s", it.s) }))
         .put("me", st.me).put("th", st.th).put("tm", st.tm).put("round", st.round)

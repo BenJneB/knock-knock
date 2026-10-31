@@ -6,8 +6,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * Compare le port Kotlin à la version JavaScript sur les scénarios générés par
- * tools/golden-plan.mjs. Régénérer le fichier (node tools/zs-golden-plan.mjs) après toute modification de plan() côté web.
+ * Non-régression du moteur : 400 scénarios dont les résultats ont été produits par l'ancien moteur JavaScript
+ * de la page web. Le même fichier vérifie la version compilée en JavaScript (tools/check-web-engine.mjs).
+ * Un changement voulu de stratégie doit mettre à jour ce fichier.
  */
 class ZsPlanGoldenTest {
 

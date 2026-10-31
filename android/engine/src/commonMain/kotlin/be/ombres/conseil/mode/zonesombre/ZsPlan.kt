@@ -1,18 +1,14 @@
 package be.ombres.conseil.mode.zonesombre
 
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
 /*
- * Port fidèle du moteur plan() de web/conseil-zone-sombre-chefs.html.
- * Les champs restent des chaînes, comme dans la version web, pour que les deux
- * versions interprètent les saisies de la même façon et donnent le même plan.
- * Toute modification ici doit être reportée dans la version JavaScript (et inversement).
+ * Moteur de stratégie du mode Zone sombre, à l'origine porté du plan() JavaScript de la page web.
+ * C'est désormais l'unique moteur : la page web utilise ce même code, compilé en JavaScript et intégré à la page.
+ * Les champs restent des chaînes, telles que saisies, pour que les deux interfaces se comportent pareil.
  */
 
 data class GuildIn(val n: String = "", val a: String = "", val r: String = "", val s: String = "")
@@ -70,7 +66,7 @@ private fun jsParseFloat(s: String): Double? = FLOAT_PREFIX.find(s)?.value?.toDo
 
 fun parseNum(v: String?): Double? {
     if (v == null) return null
-    var s = v.trim().replace(Regex("\\s"), "").replaceFirst(",", ".").uppercase(Locale.ROOT)
+    var s = v.trim().replace(Regex("\\s"), "").replaceFirst(",", ".").uppercase()
     if (s.isEmpty()) return null
     var m = 1.0
     when {
@@ -88,10 +84,7 @@ fun int(v: String?): Int {
 }
 
 /** Number.prototype.toFixed de JS : arrondit la valeur binaire exacte (646.05 → "646.0"). */
-private fun fixed(n: Double, d: Int): String {
-    val s = BigDecimal(abs(n)).setScale(d, RoundingMode.HALF_UP).toPlainString()
-    return if (n < 0) "-$s" else s
-}
+private fun fixed(n: Double, d: Int) = be.ombres.conseil.fixedImpl(n, d)
 
 fun fmt(n: Double): String = when {
     !n.isFinite() -> "?"
@@ -209,7 +202,7 @@ fun plan(st: PlanInput): PlanResult {
     if (reserveGI) { budget++; keep.add("1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.") }
     // (plus aucune carte jouable aujourd’hui : inutile de proposer un Sanctuaire sacré)
     if (stock["ss"]!! > 0 && budget > 0) threats.add("Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.")
-    threats.add("Le rival peut faire tomber votre bouclier (Sanctuaire sacré) puis vider votre salle (Esprit malveillant). Surveillez la carte et gardez des joueurs prêts.")
+    threats.add("Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.")
     if (rooms.isEmpty() && margin0 < 0) threats.add(0, "Ajoute les salles du rival pour obtenir un plan d’attaque précis.")
 
     val left = "${stock["em"]} Esprit malveillant, ${stock["sa"]} Sape d’âme, ${stock["gi"]} Garde immaculée, ${stock["ss"]} Sanctuaire sacré"

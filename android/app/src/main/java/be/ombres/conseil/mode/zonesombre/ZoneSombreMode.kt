@@ -3,6 +3,9 @@ package be.ombres.conseil.mode.zonesombre
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import android.text.format.DateFormat
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,10 +34,12 @@ import androidx.compose.ui.unit.dp
 import be.ombres.conseil.R
 import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
+import be.ombres.conseil.core.Reminders
 import be.ombres.conseil.ui.Art
 import be.ombres.conseil.mode.GameMode
 import be.ombres.conseil.mode.ReadReport
 import be.ombres.conseil.ocr.Screen
+import java.util.Date
 import be.ombres.conseil.ui.Bullets
 import be.ombres.conseil.ui.Choice
 import be.ombres.conseil.ui.Field
@@ -50,8 +56,26 @@ object ZoneSombreMode : GameMode {
         val st = ZsStore.load(context)
         val reading = ZsReader.read(screen, Prefs.guild(context), st.guilds.map { it.n })
         val r = merge(st, reading, Prefs.guild(context))
-        ZsStore.save(context, r.input)
-        return ReadReport(r.summary, r.missing, r.notes)
+        var input = r.input
+        val notes = r.notes.toMutableList()
+        if (reading.kind == ZsKind.MAP && reading.rooms.isNotEmpty()) {
+            // Part volée par les voleurs : mesurée entre cette lecture et la précédente.
+            val snap = ZsSnapshot(System.currentTimeMillis(), input.guilds.map { it.r }, input.guilds.map { it.s }, reading.rooms)
+            ZsStore.loadSnapshot(context)?.let { prev ->
+                val measures = measureSape(prev, snap)
+                measures.forEach { m ->
+                    val who = input.guilds.getOrNull(m.guild)?.n?.substringAfter('-') ?: "?"
+                    notes.add("Voleur sur $who (${m.pos}) : environ ${jsNum(kotlin.math.floor(m.share * 100 + 0.5))} % de la production de la salle, mesuré sur ${m.minutes} min.")
+                }
+                measuredSapePercent(measures)?.let { p ->
+                    notes.add("Part volée par une Sape : $p % (mesurée), au lieu de ${input.sapeP} %.")
+                    input = input.copy(sapeP = p)
+                }
+            }
+            ZsStore.saveSnapshot(context, snap)
+        }
+        ZsStore.save(context, input)
+        return ReadReport(r.summary, r.missing, notes)
     }
 
     @Composable
@@ -62,7 +86,7 @@ object ZoneSombreMode : GameMode {
             Field("Part volée par une Sape (%)", st.sapeP, { v -> upd { it.copy(sapeP = v) } }, Modifier.weight(1f), KeyboardType.Decimal)
             Field("Prod. d’une salle libre /s", st.freeV, { v -> upd { it.copy(freeV = v) } }, Modifier.weight(1f), KeyboardType.Decimal)
         }
-        Hint("La part volée par une Sape n’est pas indiquée par le jeu : 25 % est une estimation.")
+        Hint("La part volée par une Sape n’est pas indiquée par le jeu : 25 % est une estimation. La production d’une salle libre est mise à jour à chaque lecture de la carte.")
     }
 
     @Composable
@@ -98,7 +122,11 @@ object ZoneSombreMode : GameMode {
         }
         Section("Le plan", R.drawable.ic_bubble) {
             if (r.steps.isEmpty()) Text(emptyPlanText(r))
-            else Column { r.steps.forEachIndexed { i, s -> NumberedStep(i + 1, s.t, s.d, s.c) } }
+            else Column {
+                r.steps.forEachIndexed { i, s ->
+                    NumberedStep(i + 1, s.t, s.d, s.c, if ("Sape" in s.c) ({ SapeReminder(context, s.t) }) else null)
+                }
+            }
             OutlinedButton(onClick = { copyPlan(context, r) }) { Text("Copier le plan") }
         }
         if (r.keep.isNotEmpty()) Section("Cartes", R.drawable.ic_cards) { Bullets(r.keep) }
@@ -181,5 +209,28 @@ object ZoneSombreMode : GameMode {
         cm.setPrimaryClip(ClipData.newPlainText("Plan de bataille", planText(r)))
         // Depuis Android 13, le système confirme lui-même la copie.
         if (Build.VERSION.SDK_INT < 33) Toast.makeText(context, "Plan copié : collez-le dans le chat de guilde.", Toast.LENGTH_SHORT).show()
+    }
+
+    /** Une Sape dure 2 h : rappel à la fin, pour décider de la suite. */
+    @Composable
+    private fun SapeReminder(context: Context, step: String) {
+        var at by remember(step) { mutableStateOf<Long?>(null) }
+        val time = at
+        if (time != null) {
+            Hint("Rappel prévu vers ${DateFormat.getTimeFormat(context).format(Date(time))}.")
+            return
+        }
+        TextButton(onClick = {
+            if (!Reminders.canNotify(context)) {
+                Toast.makeText(context, "Autorisez les notifications de l’appli pour recevoir le rappel.", Toast.LENGTH_LONG).show()
+                context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
+                return@TextButton
+            }
+            at = Reminders.schedule(
+                context, step.hashCode(), "Fin de la Sape d’âme",
+                "${step.removePrefix("Sape d’âme sur ")} : le voleur part. Relisez la carte pour la suite du plan.",
+                2 * 60 * 60 * 1000L,
+            )
+        }) { Text("Jouée : rappel dans 2 h") }
     }
 }

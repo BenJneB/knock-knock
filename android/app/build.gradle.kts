@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":engine"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.compose.bom))
@@ -61,8 +62,6 @@ dependencies {
     implementation(libs.mlkit.text)
     implementation(libs.kotlinx.coroutines.android)
 
-    testImplementation(libs.junit)
-    testImplementation(libs.org.json)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
 }

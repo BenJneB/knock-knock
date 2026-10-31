@@ -165,6 +165,9 @@ private fun mergeRooms(input: PlanInput, r: ZsReading, notes: MutableList<String
     if (r.free.isNotEmpty()) {
         val rates = r.free.mapNotNull { it.rate }
         notes.add("Salles libres : ${r.free.size}" + if (rates.isNotEmpty()) " (${rates.joinToString(", ") { "$it/s" }})." else ".")
+        // Production d'une salle libre : la moyenne lue sur la carte remplace la valeur par défaut.
+        val values = rates.mapNotNull { parseNum(it) }
+        if (values.isNotEmpty()) st = st.copy(freeV = jsNum(kotlin.math.floor(values.average() * 10 + 0.5) / 10))
     }
     return st
 }

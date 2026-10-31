@@ -137,7 +137,7 @@ fun cardIcons(text: String): List<Int> = listOfNotNull(
 )
 
 @Composable
-fun NumberedStep(n: Int, title: String, detail: String, tag: String) {
+fun NumberedStep(n: Int, title: String, detail: String, tag: String, action: (@Composable () -> Unit)? = null) {
     Row(Modifier.padding(bottom = 12.dp)) {
         Box(
             Modifier.size(30.dp).background(Game.Night, CircleShape).border(2.dp, Game.Gold, CircleShape),
@@ -152,6 +152,7 @@ fun NumberedStep(n: Int, title: String, detail: String, tag: String) {
                     Text(tag, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             }
+            action?.invoke()
         }
     }
 }

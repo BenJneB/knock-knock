@@ -155,6 +155,8 @@ class ZsReaderTest {
         assertEquals(0 to 45, ZsReader.parseTime("Fin dans : 45 min"))
         assertEquals(null, ZsReader.parseTime("Fin dans3 h3mi"))
         assertEquals(2 to 42, ZsReader.parseTime("Fin dans :2:h 42 min"))
+        assertEquals(2 to 42, ZsReader.parseTime("Fin dans:2:h, 42 min")) // Tesseract (version web)
+        assertEquals(2 to 42, ZsReader.parseTime("Fin dans :2:h.42 min partiéipanttes:"))
     }
 
     @Test

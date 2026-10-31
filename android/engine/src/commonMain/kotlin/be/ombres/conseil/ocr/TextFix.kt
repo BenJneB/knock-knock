@@ -1,10 +1,11 @@
 package be.ombres.conseil.ocr
 
-import java.text.Normalizer
-
 /** Minuscules sans accents, pour comparer du texte lu de façon approximative. */
 fun fold(s: String): String =
-    Normalizer.normalize(s, Normalizer.Form.NFD).replace(Regex("\\p{M}"), "").lowercase()
+    nfd(s).filter { it.code !in 0x300..0x36F }.lowercase()
+
+/** Décomposition Unicode (NFD) : « é » devient « e » + accent, que [fold] retire. */
+private fun nfd(s: String) = be.ombres.conseil.nfdImpl(s)
 
 /** Lit un petit nombre isolé, en corrigeant les confusions classiques (O→0, l→1…). */
 fun digits(token: String): Int? {

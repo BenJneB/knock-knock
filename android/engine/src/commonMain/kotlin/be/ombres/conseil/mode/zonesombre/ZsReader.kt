@@ -65,15 +65,20 @@ object ZsReader {
 
     val CARD_KEYS = listOf("em", "sa", "gi", "ss")
 
+    /** Cartes au départ de la phase (aucune nouvelle ensuite) : une quantité plus grande est une erreur de lecture. */
+    val CARD_MAX = listOf(2, 10, 6, 6)
+
     // Position des chiffres de salles dans une colonne du bandeau (fraction de la largeur de colonne),
     // mesurée sur une capture 1080 px de large.
     private val ROOM_SLOTS = listOf(0.508, 0.675, 0.842)
 
-    private val NAME = Regex("[sS5]\\d{1,3}\\s*-\\s*[\\p{L}0-9]+")
+    private val NAME = Regex("[sS5]\\d{1,3}\\s*-\\s*[A-Za-zÀ-ÿ0-9]+")
     private val SOUL = Regex("(\\d+(?:[.,]\\d+)?)\\s*([KMB])\\b")
     private val SOUL_NOSEP = Regex("(?<![\\d.,])(\\d{4,5})([KMB])\\b")
     private val RATE = Regex("(\\d+(?:[.,]\\d+)?)\\s*/\\s*[s5%$]")
-    private val TIME_HM = Regex("(\\d{1,2})\\s*[:.]?\\s*h\\s*(\\d{1,2})\\D{0,2}?m[i1l]?n")
+    // Deux-points écrit \x3A dans les classes : sur Android (ICU), « [: … :] » est une syntaxe spéciale
+    // et fait planter la compilation de l'expression (les tests JVM ne le voient pas).
+    private val TIME_HM = Regex("(\\d{1,2})\\s*[\\x3A.]?\\s*h[\\s.,\\x3A]*(\\d{1,2})\\D{0,2}?m[i1l]?n")
     private val TIME_M = Regex("(\\d{1,2})\\D{0,2}?m[i1l]?n")
     private val TODAY = Regex("(\\d{1,2})\\s*/\\s*15")
 
@@ -113,7 +118,7 @@ object ZsReader {
 
     private fun isAme(l: OcrLine): Boolean {
         val f = fold(l.text)
-        return f.startsWith("ame") || f.startsWith("me:") || Regex("\\bame\\s*[:.]").containsMatchIn(f)
+        return f.startsWith("ame") || f.startsWith("me:") || Regex("\\bame\\s*[\\x3A.]").containsMatchIn(f)
     }
 
     private suspend fun readBanner(screen: Screen): Banner? {
@@ -182,7 +187,7 @@ object ZsReader {
 
     /* ---------- salles sur la carte ---------- */
 
-    private val DMG = Regex("(?i)dm[g6]\\s*([:.;&,]?)\\s*([0-9OSA]+(?:[.,][0-9OSA]+)?)\\s*([KMB])?")
+    private val DMG = Regex("dm[g6]\\s*([\\x3A.;&,]?)\\s*([0-9OSA]+(?:[.,][0-9OSA]+)?)\\s*([KMB])?", RegexOption.IGNORE_CASE)
     private val FREE_RATE = Regex("(\\d+(?:[.,]\\d+)?)\\s*/\\s*[s5]")
 
     /** Bleu clair de la bulle de bouclier (le sol de la carte est violet : g < r). */
@@ -311,7 +316,9 @@ object ZsReader {
         val votes = Votes<Pair<Int, Int>>()
         for ((scale, f) in listOf(2 to Filter.GRAY, 3 to Filter.GRAY, 2 to Filter.COLOR, 3 to Filter.COLOR)) {
             val p = screen.ocr(CropRequest(box[0], box[1], box[2], box[3], scale, f))
-            votes.add(parseTime(p.lines.joinToString(" ") { it.text }))
+            val t = parseTime(p.lines.joinToString(" ") { it.text })
+            // « 42 min » seul peut être « 2 h 42 min » dont les heures sont mal lues : il compte moins.
+            votes.add(t, if (t?.first == 0) 0.4 else 1.0)
         }
         return votes.best()
     }
@@ -359,7 +366,7 @@ object ZsReader {
                 if (e.top < qTop + qh / 2 || !e.text.trim().all { it.isDigit() }) continue
                 val k = centers.indices.minBy { kotlin.math.abs(centers[it] - e.cx) }
                 if (kotlin.math.abs(centers[k] - e.cx) > half) continue
-                votes[k].add(e.text.trim().toIntOrNull())
+                votes[k].add(e.text.trim().toIntOrNull()?.takeIf { it <= CARD_MAX[k] })
             }
         }
         return CARD_KEYS.indices.associate { CARD_KEYS[it] to votes[it].best() }
