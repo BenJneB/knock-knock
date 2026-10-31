@@ -1,0 +1,170 @@
+package be.ombres.conseil.mode.zonesombre
+
+import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import be.ombres.conseil.R
+import be.ombres.conseil.core.Prefs
+import be.ombres.conseil.ui.Art
+import be.ombres.conseil.mode.GameMode
+import be.ombres.conseil.mode.ReadReport
+import be.ombres.conseil.ocr.Screen
+import be.ombres.conseil.ui.Bullets
+import be.ombres.conseil.ui.Choice
+import be.ombres.conseil.ui.Field
+import be.ombres.conseil.ui.Hint
+import be.ombres.conseil.ui.Labeled
+import be.ombres.conseil.ui.NumberedStep
+import be.ombres.conseil.ui.Section
+
+object ZoneSombreMode : GameMode {
+    override val id = "zone-sombre"
+    override val title = "Affrontement Zone sombre"
+
+    override suspend fun read(context: Context, screen: Screen): ReadReport {
+        val st = ZsStore.load(context)
+        val reading = ZsReader.read(screen, Prefs.guild(context), st.guilds.map { it.n })
+        val r = merge(st, reading, Prefs.guild(context))
+        ZsStore.save(context, r.input)
+        return ReadReport(r.summary, r.missing, r.notes)
+    }
+
+    @Composable
+    override fun Settings(context: Context) {
+        var st by remember { mutableStateOf(ZsStore.load(context)) }
+        fun upd(f: (PlanInput) -> PlanInput) { st = f(st); ZsStore.save(context, st) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Field("Part volée par une Sape (%)", st.sapeP, { v -> upd { it.copy(sapeP = v) } }, Modifier.weight(1f), KeyboardType.Decimal)
+            Field("Prod. d’une salle libre /s", st.freeV, { v -> upd { it.copy(freeV = v) } }, Modifier.weight(1f), KeyboardType.Decimal)
+        }
+        Hint("La part volée par une Sape n’est pas indiquée par le jeu : 25 % est une estimation.")
+    }
+
+    @Composable
+    override fun Council(context: Context, report: ReadReport?) {
+        var st by remember { mutableStateOf(ZsStore.load(context)) }
+        fun upd(f: (PlanInput) -> PlanInput) { st = f(st); ZsStore.save(context, st) }
+
+        if (report != null) Section("Lecture", R.drawable.ic_eye, MaterialTheme.colorScheme.tertiaryContainer) {
+            Text(report.summary)
+            if (report.notes.isNotEmpty()) Bullets(report.notes)
+            if (report.missing.isNotEmpty()) {
+                Text("À vérifier ou saisir :", fontWeight = FontWeight.Bold)
+                Bullets(report.missing)
+            }
+        }
+
+        PlanView(plan(st))
+        Inputs(st, ::upd)
+    }
+
+    @Composable
+    private fun PlanView(r: PlanResult) {
+        if (r is PlanErrors) {
+            Section("Il manque des valeurs", R.drawable.ic_eye, MaterialTheme.colorScheme.tertiaryContainer) { Bullets(r.errs) }
+            return
+        }
+        r as PlanOk
+        val v = verdict(r)
+        Section(v.title, R.drawable.ic_trophy, if (v.win) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primaryContainer) {
+            v.lines.forEach { Text(it) }
+            Hint(v.hint)
+        }
+        Section("Le plan", R.drawable.ic_bubble) {
+            if (r.steps.isEmpty()) Text(emptyPlanText(r))
+            else Column { r.steps.forEachIndexed { i, s -> NumberedStep(i + 1, s.t, s.d, s.c) } }
+        }
+        if (r.keep.isNotEmpty()) Section("Cartes", R.drawable.ic_cards) { Bullets(r.keep) }
+        if (r.threats.isNotEmpty()) Section("À surveiller", R.drawable.ic_eye) { Bullets(r.threats) }
+    }
+
+    @Composable
+    private fun Inputs(st: PlanInput, upd: ((PlanInput) -> PlanInput) -> Unit) {
+        Section("Les trois guildes", R.drawable.ic_house) {
+            Hint("Lues dans le bandeau du haut. Corrigez si besoin ; « Nous » = votre guilde.")
+            st.guilds.forEachIndexed { i, g ->
+                fun set(ng: GuildIn) = upd { s -> s.copy(guilds = s.guilds.toMutableList().also { it[i] = ng }) }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Field("Nom de la guilde", g.n, { set(g.copy(n = it)) }, Modifier.weight(1f), KeyboardType.Text)
+                    RadioButton(selected = st.me == i, onClick = { upd { it.copy(me = i) } })
+                    Text("Nous")
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Field("Âme", g.a, { set(g.copy(a = it)) }, Modifier.weight(1.4f), KeyboardType.Text) { Art(R.drawable.ic_flame, 20) }
+                    Field("Prod. /s", g.r, { set(g.copy(r = it)) }, Modifier.weight(1f), KeyboardType.Decimal)
+                    Field("Salles", g.s, { set(g.copy(s = it)) }, Modifier.weight(0.9f))
+                }
+            }
+        }
+
+        Section("Temps et tour", R.drawable.ic_hourglass) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Field("Heures", st.th, { v -> upd { it.copy(th = v) } }, Modifier.weight(1f))
+                Field("Minutes", st.tm, { v -> upd { it.copy(tm = v) } }, Modifier.weight(1f))
+            }
+            Choice(listOf("1" to "Jour 1", "2" to "Jour 2", "3" to "Jour 3", "f" to "Finale"), st.round) { v -> upd { it.copy(round = v) } }
+        }
+
+        Section("Nos cartes", R.drawable.ic_cards) {
+            Hint("Lues dans le coffre de cartes et mémorisées.")
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                CardField("Esprit", R.drawable.ic_card_spirit, st.em, { v -> upd { it.copy(em = v) } }, Modifier.weight(1f))
+                CardField("Sape", R.drawable.ic_card_thief, st.sa, { v -> upd { it.copy(sa = v) } }, Modifier.weight(1f))
+                CardField("Garde", R.drawable.ic_card_guard, st.gi, { v -> upd { it.copy(gi = v) } }, Modifier.weight(1f))
+                CardField("Sanct.", R.drawable.ic_card_sanctuary, st.ss, { v -> upd { it.copy(ss = v) } }, Modifier.weight(1f))
+            }
+            Field("Cartes jouables aujourd’hui", st.today, { v -> upd { it.copy(today = v) } }, Modifier.fillMaxWidth())
+        }
+
+        Section("Salles du rival", R.drawable.ic_house) {
+            Hint("Repérées sur la carte du match (bouclier, voleur). « Battable » : vos joueurs peuvent la prendre en combat — estimé d’après les DMG, à corriger si besoin.")
+            if (st.rooms.isEmpty()) Hint("Aucune salle ajoutée.")
+            st.rooms.forEachIndexed { i, r ->
+                fun set(nr: RoomIn) = upd { s -> s.copy(rooms = s.rooms.toMutableList().also { it[i] = nr }) }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (r.sh) Art(R.drawable.ic_shield_bubble, 28, Modifier.padding(end = 6.dp))
+                    Field("Salle", r.n, { set(r.copy(n = it)) }, Modifier.weight(1f), KeyboardType.Text)
+                    IconButton(onClick = { upd { s -> s.copy(rooms = s.rooms.toMutableList().also { it.removeAt(i) }) } }) { Text("✕") }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Labeled("Bouclier", R.drawable.ic_shield_bubble) { Choice(listOf(false to "Non", true to "Oui"), r.sh) { set(r.copy(sh = it)) } }
+                    Labeled("Battable") { Choice(listOf(true to "Oui", false to "Non"), r.b) { set(r.copy(b = it)) } }
+                }
+            }
+            OutlinedButton(onClick = { upd { it.copy(rooms = it.rooms + RoomIn()) } }) { Text("Ajouter une salle") }
+        }
+
+        Section("Notre défense", R.drawable.ic_card_guard) {
+            Labeled("Bouclier sur notre salle principale", R.drawable.ic_shield_bubble) { Choice(listOf(true to "Oui", false to "Non"), st.shield) { v -> upd { it.copy(shield = v) } } }
+            Field("Salles libres prenables", st.free, { v -> upd { it.copy(free = v) } }, Modifier.fillMaxWidth())
+        }
+    }
+
+    @Composable
+    private fun CardField(label: String, @DrawableRes icon: Int, value: String, onChange: (String) -> Unit, modifier: Modifier) {
+        Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+            Art(icon, 34)
+            Field(label, value, onChange, Modifier.fillMaxWidth())
+        }
+    }
+}

@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Conseil" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+    </style>
+    <color name="bg">#EDE8F3</color>
+</resources>

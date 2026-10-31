@@ -1,0 +1,6 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- Bulle de bouclier -->
+    <path android:fillColor="#555FD6E8" android:strokeColor="#8FE9F5" android:strokeWidth="1.2" android:pathData="M12,12m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0" />
+    <path android:fillColor="#2AA8C0" android:pathData="M12,6L17,8L17,12C17,15 14.8,17.3 12,18.5C9.2,17.3 7,15 7,12L7,8Z" />
+    <path android:fillColor="#B8F4FB" android:pathData="M7.2,6.5C8.5,5 10.2,4.3 12,4.3L12,5.3C10.5,5.3 9.1,5.9 8,7.1Z" />
+</vector>

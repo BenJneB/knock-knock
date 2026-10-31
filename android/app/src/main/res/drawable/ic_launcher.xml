@@ -1,0 +1,9 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#2E1D45" />
+            <stroke android:width="3dp" android:color="#3FB8C9" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/ic_door" android:top="9dp" android:bottom="9dp" android:left="9dp" android:right="9dp" />
+</layer-list>

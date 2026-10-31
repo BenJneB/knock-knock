@@ -1,0 +1,6 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- Deux épées croisées -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M6.9,4.5L4.5,4.5L4.5,6.9L13.6,16L12.2,17.4L13.6,18.8L15,17.4L17.5,19.9L19.9,17.5L17.4,15L18.8,13.6L17.4,12.2L16,13.6ZM17.1,4.5L19.5,4.5L19.5,6.9L15.1,11.3L12.7,8.9ZM8.6,13L11,15.4L9,17.4L10.4,18.8L9,20.2L6.5,17.7L4.1,20.1L3.9,19.9L6.3,17.5L3.8,15L5.2,13.6L6.6,15Z" />
+</vector>

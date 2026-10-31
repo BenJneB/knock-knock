@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conseil de guerre – Version chefs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ede8f3; --paper:#fbf9fd; --ink:#221a2e; --muted:#665b74; --line:#d6cde1;
+  --accent:#17808c; --lose-soft:#f8dcc6; --ally:#2e9e6b; --ally-soft:#d2f0ee; --warn-soft:#fbebc6;
+  --night:#2e1d45; --night-deep:#1b1226; --cyan:#3fb8c9; --gold:#f2c14e;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1b1226; --paper:#261a35; --ink:#f1eaf8; --muted:#b6a9c6; --line:#3e2f52;
+    --accent:#4fd1dc; --lose-soft:#4a2c1c; --ally:#5fd39a; --ally-soft:#15393a; --warn-soft:#3e3214; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1b1226; --paper:#261a35; --ink:#f1eaf8; --muted:#b6a9c6; --line:#3e2f52;
+  --accent:#4fd1dc; --lose-soft:#4a2c1c; --ally:#5fd39a; --ally-soft:#15393a; --warn-soft:#3e3214; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Nunito",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+h1,h2,h3{font-family:"Grenze Gotisch","Palatino Linotype",Georgia,serif;font-weight:700;line-height:1.1;margin:0}
+h1{font-size:2.4rem;color:var(--gold)}
+.banner{display:flex;align-items:center;gap:14px;background:linear-gradient(var(--night),var(--night-deep));border:2px solid var(--cyan);border-radius:16px;padding:14px 16px;margin-bottom:18px}
+.banner .lead{color:#d9cce8;margin:4px 0 0}
+.banner .door{width:56px;height:56px;flex:none}
+.ic{width:24px;height:24px;flex:none;vertical-align:-4px}
+h3{display:flex;align-items:center;gap:8px}
+h3 .ic{fill:var(--accent)}
+.card-ic{display:block;width:34px;height:34px;margin:0 auto 4px}
+.tag .ic{width:18px;height:18px;margin-right:4px;vertical-align:-3px}
+h3{font-size:1.45rem;color:var(--accent);margin-bottom:10px}
+.lead{color:var(--muted);margin:6px 0 20px}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+label,.lbl{display:block;font-weight:800;font-size:13px;margin-bottom:3px}
+.hint{font-size:13px;color:var(--muted);margin:0 0 10px}
+input,select{width:100%;font:16px "Nunito",sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.g4 label{font-size:12px;font-weight:600;color:var(--muted);min-height:32px;line-height:1.2}
+.guild{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
+.guild.me{border:2px solid var(--ally);background:var(--ally-soft)}
+.guild-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.guild-head input[type=text]{flex:1}
+.me-pick{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;white-space:nowrap}
+.me-pick input{width:auto}
+.room{display:grid;grid-template-columns:1fr 1fr 1fr 36px;gap:6px;align-items:end;margin-bottom:8px}
+.room input,.room select{padding:8px 6px;font-size:15px}
+.x{border:0;background:var(--lose-soft);color:var(--ink);border-radius:10px;height:40px;font-size:18px;cursor:pointer}
+.ghost{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:8px 14px;font:700 14px "Nunito",sans-serif;cursor:pointer}
+.go{width:100%;border:0;border-radius:14px;background:var(--accent);color:#fff;font:800 17px "Nunito",sans-serif;padding:15px;cursor:pointer;margin-bottom:14px}
+details summary{cursor:pointer;font-weight:800}
+.verdict{border-radius:16px;padding:18px;margin-bottom:14px;background:var(--lose-soft)}
+.verdict.win{background:var(--ally-soft)}
+.verdict h2{font-size:1.9rem;margin-bottom:6px}
+.verdict p{margin:4px 0}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 14px 42px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:var(--night);border:2px solid var(--gold);color:var(--gold);font-weight:800;display:grid;place-items:center}
+ol.steps strong{display:block}
+.tag{display:inline-block;background:var(--ally-soft);border-radius:999px;padding:1px 10px;font-size:13px;font-weight:700;margin-top:4px}
+ul.plain{margin:0;padding-left:20px} ul.plain li{margin-bottom:6px}
+.err{background:var(--warn-soft);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+@media (max-width:420px){.g4{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<!-- Icônes (mêmes dessins que l'appli Android : android/app/src/main/res/drawable/) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-door" viewBox="0 0 24 24"><path fill="#5A3A1C" d="M5,22L5,9.5A7,7 0,0 1,19,9.5L19,22Z"/><path fill="#9C6430" d="M6.6,22L6.6,9.7A5.4,5.4 0,0 1,17.4,9.7L17.4,22Z"/><path fill="#7E4E22" d="M9.4,5.2L10.4,5L10.4,22L9.4,22ZM13.6,5L14.6,5.2L14.6,22L13.6,22Z"/><circle cx="12" cy="12.2" r="1.9" fill="none" stroke="#F2C14E" stroke-width="1.2"/><path fill="#F2C14E" d="M11.2,9.6L12.8,9.6L12.8,10.6L11.2,10.6Z"/><path fill="#3B2556" d="M4,21L20,21L20,22.5L4,22.5Z"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M12,3L2.5,11L5,11L5,21L10,21L10,15.5L14,15.5L14,21L19,21L19,11L21.5,11Z"/></symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6,2L18,2L18,4L17,4C17,8 14.5,10 13.5,12C14.5,14 17,16 17,20L18,20L18,22L6,22L6,20L7,20C7,16 9.5,14 10.5,12C9.5,10 7,8 7,4L6,4ZM9,4C9,6.5 10.5,8.5 12,10C13.5,8.5 15,6.5 15,4ZM12,15C10.5,16.5 9.4,18 9.1,20L14.9,20C14.6,18 13.5,16.5 12,15Z"/></symbol>
+  <symbol id="i-cards" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3.2,7.4L9,6.4L9,8.4L5.5,9L7.7,20.6L13.6,19.5L13.9,21.5L6.1,23ZM10,2L20,2L20,19L10,19ZM12,4L12,17L18,17L18,4Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12,2.5L19.5,5.5L19.5,11C19.5,15.8 16.3,19.6 12,21.5C7.7,19.6 4.5,15.8 4.5,11L4.5,5.5Z"/></symbol>
+  <symbol id="i-spirit" viewBox="0 0 24 24"><path fill="#D9473B" d="M12,2.5C7.6,2.5 5,6 5,10.2L5,20.5L7.3,18.8L9.6,20.5L12,18.8L14.4,20.5L16.7,18.8L19,20.5L19,10.2C19,6 16.4,2.5 12,2.5Z"/><circle cx="9.4" cy="10.2" r="1.8" fill="#fff"/><circle cx="14.6" cy="10.2" r="1.8" fill="#fff"/><circle cx="9.8" cy="10.6" r=".8" fill="#2A1730"/><circle cx="15" cy="10.6" r=".8" fill="#2A1730"/><path fill="#7A1E18" d="M9.5,14.5L14.5,14.5L13.5,16L10.5,16Z"/></symbol>
+  <symbol id="i-thief" viewBox="0 0 24 24"><path fill="#2B2F6B" d="M10.5,3C7.5,3 5.5,5.4 5.5,8.3C5.5,9.9 6.2,11.3 7.3,12.2C4.8,13.4 3,15.9 3,19L3,21.5L17,21.5L17,19C17,16 15.4,13.5 13.2,12.3C14.5,11.3 15.4,9.9 15.4,8.3C15.4,5.3 13.4,3 10.5,3Z"/><path fill="#FFD166" d="M8.3,8.6L10,9.2L8.4,9.8ZM12.6,8.6L10.9,9.2L12.5,9.8Z"/><circle cx="18.5" cy="7" r="3" fill="#48C8F0" stroke="#B8F4FB" stroke-width=".8"/></symbol>
+  <symbol id="i-guard" viewBox="0 0 24 24"><path fill="#F2C14E" stroke="#B8860B" d="M12,2.5L19.5,5.5L19.5,11C19.5,15.8 16.3,19.6 12,21.5C7.7,19.6 4.5,15.8 4.5,11L4.5,5.5Z"/><path fill="#fff" d="M11,7L13,7L13,10L16,10L16,12L13,12L13,17L11,17L11,12L8,12L8,10L11,10Z"/></symbol>
+  <symbol id="i-sanctuary" viewBox="0 0 24 24"><path fill="#6FE3F0" stroke="#1B8C9C" stroke-width=".8" d="M12,1.5L13.6,9L20.5,5.5L15,10.8L22.5,12L15,13.2L20.5,18.5L13.6,15L12,22.5L10.4,15L3.5,18.5L9,13.2L1.5,12L9,10.8L3.5,5.5L10.4,9Z"/><circle cx="12" cy="12" r="2" fill="#fff"/></symbol>
+</svg>
+<div class="wrap">
+  <div class="banner">
+    <svg class="door" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-door"/></svg>
+    <div><h1>Conseil de guerre</h1>
+    <p class="lead">Version chefs : entre les chiffres du match, obtiens le plan de bataille.</p></div>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-house"/></svg>Les trois guildes</h3>
+    <p class="hint">Chiffres affichés en haut de la carte. Coche votre guilde.</p>
+    <div id="guilds"></div>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-hourglass"/></svg>Temps et tour</h3>
+    <div class="g3">
+      <div><label for="th">Heures</label><input type="number" id="th" inputmode="numeric" min="0"></div>
+      <div><label for="tm">Minutes</label><input type="number" id="tm" inputmode="numeric" min="0" max="59"></div>
+      <div><label for="round">Tour</label>
+        <select id="round"><option value="1">Jour 1</option><option value="2">Jour 2</option><option value="3">Jour 3</option><option value="f">Finale</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cards"/></svg>Nos cartes</h3>
+    <p class="hint">Dans le coffre : la quantité sous chaque carte, et « Disponible aujourd’hui ».</p>
+    <div class="g4">
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-spirit"/></svg><label for="em">Esprit malveillant</label><input type="number" id="em" inputmode="numeric" min="0"></div>
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-thief"/></svg><label for="sa">Sape d’âme</label><input type="number" id="sa" inputmode="numeric" min="0"></div>
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-guard"/></svg><label for="gi">Garde immaculée</label><input type="number" id="gi" inputmode="numeric" min="0"></div>
+      <div><svg class="card-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sanctuary"/></svg><label for="ss">Sanctuaire sacré</label><input type="number" id="ss" inputmode="numeric" min="0"></div>
+    </div>
+    <div style="margin-top:10px"><label for="today">Cartes jouables aujourd’hui</label><input type="number" id="today" inputmode="numeric" min="0" max="15"></div>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-house"/></svg>Salles du rival</h3>
+    <p class="hint">Une ligne par salle de la guilde à battre. « Battable » : vos joueurs peuvent la prendre en combat.</p>
+    <div id="rooms"></div>
+    <button class="ghost" id="addRoom" type="button">Ajouter une salle</button>
+  </div>
+
+  <div class="box">
+    <h3><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg>Notre défense</h3>
+    <div class="g2">
+      <div><label for="shield">Bouclier sur notre salle principale</label>
+        <select id="shield"><option value="1">Oui</option><option value="0">Non</option></select></div>
+      <div><label for="free">Salles libres prenables</label><input type="number" id="free" inputmode="numeric" min="0"></div>
+    </div>
+    <details style="margin-top:12px">
+      <summary>Réglages avancés</summary>
+      <div class="g2" style="margin-top:10px">
+        <div><label for="freeV">Prod. d’une salle libre /s</label><input type="number" id="freeV" inputmode="decimal"></div>
+        <div><label for="sapeP">Part volée par une Sape (%)</label><input type="number" id="sapeP" inputmode="decimal"></div>
+      </div>
+      <p class="hint" style="margin-top:8px">La part volée par une Sape n’est pas indiquée par le jeu : 25 % est une estimation.</p>
+    </details>
+  </div>
+
+  <button class="go" id="run" type="button">Calculer le plan</button>
+  <div id="out"></div>
+  <p style="text-align:center"><button class="ghost" id="reset" type="button">Tout effacer</button></p>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const STORE = "zs-chefs-v1";
+const DEF = { guilds:[{n:"s40-Ombres",a:"",r:"",s:""},{n:"",a:"",r:"",s:""},{n:"",a:"",r:"",s:""}], me:0,
+  th:"", tm:"", round:"1", em:"", sa:"", gi:"", ss:"", today:"", rooms:[], shield:"1", free:"0", freeV:"3", sapeP:"25" };
+let st = load();
+
+function load(){ try { const s = JSON.parse(localStorage.getItem(STORE)); if (s && s.guilds) return Object.assign(structuredClone(DEF), s); } catch {} return structuredClone(DEF); }
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(st)); } catch {} }
+
+/* ---------- guilds ---------- */
+function drawGuilds(){
+  const box = $("#guilds"); box.innerHTML = "";
+  st.guilds.forEach((g, i) => {
+    const d = document.createElement("div"); d.className = "guild" + (st.me === i ? " me" : "");
+    d.innerHTML = `
+      <div class="guild-head">
+        <input type="text" placeholder="Nom de la guilde" aria-label="Nom de la guilde ${i+1}" data-k="n" value="">
+        <label class="me-pick"><input type="radio" name="me" ${st.me === i ? "checked" : ""}> Nous</label>
+      </div>
+      <div class="g3">
+        <div><label>Âme</label><input type="text" inputmode="decimal" placeholder="683.16K" data-k="a"></div>
+        <div><label>Prod. /s</label><input type="number" inputmode="decimal" data-k="r"></div>
+        <div><label>Salles</label><input type="number" inputmode="numeric" min="0" data-k="s"></div>
+      </div>`;
+    d.querySelectorAll("[data-k]").forEach(inp => { inp.value = g[inp.dataset.k] ?? ""; inp.oninput = () => { g[inp.dataset.k] = inp.value; save(); }; });
+    d.querySelector("input[type=radio]").onchange = () => { st.me = i; save(); drawGuilds(); };
+    box.append(d);
+  });
+}
+
+/* ---------- rooms ---------- */
+function drawRooms(){
+  const box = $("#rooms"); box.innerHTML = "";
+  if (!st.rooms.length) { const p = document.createElement("p"); p.className = "hint"; p.textContent = "Aucune salle ajoutée."; box.append(p); }
+  st.rooms.forEach((r, i) => {
+    const d = document.createElement("div"); d.className = "room";
+    d.innerHTML = `
+      <div><label>Salle</label><input type="text" placeholder="haut gauche" data-k="n"></div>
+      <div><label>Bouclier</label><select data-k="sh"><option value="0">Non</option><option value="1">Oui</option></select></div>
+      <div><label>Battable</label><select data-k="b"><option value="1">Oui</option><option value="0">Non</option></select></div>
+      <button class="x" type="button" aria-label="Retirer la salle">×</button>`;
+    d.querySelectorAll("[data-k]").forEach(inp => { inp.value = r[inp.dataset.k] ?? ""; inp.oninput = inp.onchange = () => { r[inp.dataset.k] = inp.value; save(); }; });
+    d.querySelector(".x").onclick = () => { st.rooms.splice(i, 1); save(); drawRooms(); };
+    box.append(d);
+  });
+}
+$("#addRoom").onclick = () => { st.rooms.push({ n:"", sh:"0", b:"1" }); save(); drawRooms(); };
+
+/* ---------- simple fields ---------- */
+["th","tm","round","em","sa","gi","ss","today","shield","free","freeV","sapeP"].forEach(k => {
+  const e = $("#" + k); e.value = st[k] ?? ""; e.oninput = e.onchange = () => { st[k] = e.value; save(); };
+});
+$("#reset").onclick = () => { if (!confirm("Effacer toutes les valeurs ?")) return; st = structuredClone(DEF); save(); location.reload(); };
+
+drawGuilds(); drawRooms();
+
+/* ---------- helpers ---------- */
+function parseNum(v){
+  if (v == null) return null; let s = String(v).trim().replace(/\s/g, "").replace(",", ".").toUpperCase();
+  if (!s) return null; let m = 1;
+  if (s.endsWith("K")) { m = 1e3; s = s.slice(0, -1); } else if (s.endsWith("M")) { m = 1e6; s = s.slice(0, -1); } else if (s.endsWith("B")) { m = 1e9; s = s.slice(0, -1); }
+  const x = parseFloat(s); return isFinite(x) ? x * m : null;
+}
+const int = v => { const x = parseInt(v, 10); return isFinite(x) && x > 0 ? x : 0; };
+const fmt = n => !isFinite(n) ? "?" : Math.abs(n) >= 1e6 ? (n/1e6).toFixed(2) + "M" : Math.abs(n) >= 1e3 ? (n/1e3).toFixed(1) + "K" : String(Math.round(n));
+const dur = s => { if (!isFinite(s) || s < 0) return "jamais"; const h = Math.floor(s/3600), m = Math.round((s%3600)/60); return h ? `${h} h ${String(m).padStart(2,"0")}` : `${m} min`; };
+// Pastille de coût, avec l'icône des cartes citées (« 1 Sanctuaire sacré + 1 Esprit malveillant »).
+function tag(text){
+  const t = el("span", "tag");
+  [["Sanctuaire", "sanctuary"], ["Esprit", "spirit"], ["Sape", "thief"], ["Garde", "guard"]].forEach(([w, id]) => {
+    if (text.includes(w)) t.insertAdjacentHTML("beforeend", `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${id}"/></svg>`);
+  });
+  t.append(text); return t;
+}
+function el(t, c, x){ const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+
+/* ---------- strategy engine ---------- */
+function plan(){
+  const G = st.guilds.map(g => ({ n: g.n || "?", a: parseNum(g.a), r: parseNum(g.r), s: int(g.s) }));
+  const me = G[st.me];
+  const T = int(st.th) * 3600 + int(st.tm) * 60;
+  const errs = [];
+  if (me.a == null || me.r == null) errs.push("Remplis l’Âme et la production de votre guilde.");
+  const others = G.filter((g, i) => i !== st.me && g.a != null && g.r != null);
+  if (!others.length) errs.push("Remplis au moins une guilde adverse (Âme et production).");
+  if (!T) errs.push("Indique le temps restant.");
+  if (errs.length) return { errs };
+
+  const fin = g => g.a + g.r * T;
+  const rival = others.sort((x, y) => fin(y) - fin(x))[0];
+  const room = rival.s ? rival.r / rival.s : rival.r / Math.max(1, st.rooms.length || 4);
+  const freeV = parseNum(st.freeV) ?? 3, p = (parseNum(st.sapeP) ?? 25) / 100;
+  const finale = st.round === "f";
+
+  let myR = me.r, enR = rival.r;
+  const margin0 = fin(me) - fin(rival);
+  let margin = margin0;
+  const stock = { em:int(st.em), sa:int(st.sa), gi:int(st.gi), ss:int(st.ss) };
+  let budget = Math.min(int(st.today), stock.em + stock.sa + stock.gi + stock.ss);
+  const steps = [], threats = [], keep = [];
+  const use = c => { stock[c]--; budget--; };
+  const safety = room * 3600; // marge : une salle rivale pendant 1 h
+
+  // 1. Défense de la salle principale
+  let reserveGI = false;
+  if (st.shield === "0") {
+    if (stock.gi > 0 && budget > 0) {
+      use("gi");
+      steps.push({ t: "Mettre un bouclier sur notre salle principale", d: "Sans bouclier, le rival peut la vider avec un Esprit malveillant ou y placer un voleur. C’est votre source de production : à protéger avant tout.", c: "1 Garde immaculée" });
+    } else threats.push("Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.");
+  } else if (stock.gi > 0 && budget > 1) { reserveGI = true; budget--; }
+
+  // 2. Candidats offensifs
+  const rooms = st.rooms.map((r, i) => ({ i, n: r.n || `salle ${i + 1}`, sh: r.sh === "1", b: r.b === "1", used: false }));
+  const take = 2 * room * T, sapeGain = 2 * p * room * Math.min(7200, T);
+  const need = () => (finale ? safety * 2 : safety) - margin;
+
+  function candidates(){
+    const c = [];
+    rooms.filter(r => !r.used).forEach(r => {
+      if (r.b && !r.sh) c.push({ r, cost:{}, gain: take, kind: "combat" });
+      if (r.b && r.sh) c.push({ r, cost:{ ss:1 }, gain: take, kind: "ss-combat" });
+      if (!r.b && !r.sh) c.push({ r, cost:{ em:1 }, gain: take, kind: "em" });
+      if (!r.b && r.sh) c.push({ r, cost:{ ss:1, em:1 }, gain: take, kind: "ss-em" });
+      if (!r.sh) c.push({ r, cost:{ sa:1 }, gain: sapeGain, kind: "sape" });
+    });
+    if (freeLeft > 0) c.push({ cost:{}, gain: freeV * T, kind: "free" });
+    return c.filter(x => Object.entries(x.cost).every(([k, v]) => stock[k] >= v) && Object.values(x.cost).reduce((a, b) => a + b, 0) <= budget);
+  }
+  let freeLeft = int(st.free);
+  const score = x => { const n = Object.values(x.cost).reduce((a, b) => a + b, 0); return n === 0 ? 1e15 + x.gain : x.gain / n; };
+
+  while (need() > 0) {
+    const c = candidates().sort((a, b) => score(b) - score(a))[0];
+    if (!c) break;
+    Object.entries(c.cost).forEach(([k, v]) => { for (let j = 0; j < v; j++) use(k); });
+    margin += c.gain;
+    if (c.r) c.r.used = true;
+    if (c.kind === "free") { freeLeft--; myR += freeV; steps.push({ t: "Occuper une salle libre", d: `Production gratuite : +${freeV}/s pour vous.`, c: "" }); continue; }
+    if (c.kind === "sape") { steps.push({ t: `Sape d’âme sur ${c.r.n}`, d: "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.", c: "1 Sape d’âme" }); continue; }
+    myR += room; enR -= room;
+    if (c.kind === "combat") steps.push({ t: `Attaquer ${c.r.n} en combat`, d: "Salle battable sans bouclier : aucune carte nécessaire. Vous gagnez sa production et le rival la perd.", c: "" });
+    if (c.kind === "ss-combat") steps.push({ t: `Retirer le bouclier de ${c.r.n}, puis l’attaquer`, d: "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.", c: "1 Sanctuaire sacré" });
+    if (c.kind === "em") steps.push({ t: `Vider ${c.r.n} et l’occuper tout de suite`, d: "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.", c: "1 Esprit malveillant" });
+    if (c.kind === "ss-em") steps.push({ t: `Retirer le bouclier de ${c.r.n}, la vider et l’occuper`, d: "Sanctuaire sacré pour faire tomber le bouclier, puis Esprit malveillant. Vos joueurs doivent être prêts à entrer aussitôt.", c: "1 Sanctuaire sacré + 1 Esprit malveillant" });
+  }
+
+  // 3. En finale, les cartes restantes ne servent plus à rien : on vide les Sapes
+  if (finale) {
+    rooms.filter(r => !r.used && !r.sh).forEach(r => {
+      if (stock.sa > 0 && budget > 0) { use("sa"); r.used = true; margin += sapeGain; steps.push({ t: `Sape d’âme sur ${r.n}`, d: "C’est la finale : les cartes non jouées seront perdues, autant les utiliser.", c: "1 Sape d’âme" }); }
+    });
+  }
+
+  if (reserveGI) { budget++; keep.push("1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt."); }
+  // (plus aucune carte jouable aujourd’hui : inutile de proposer un Sanctuaire sacré)
+  if (stock.ss > 0 && budget > 0) threats.push("Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.");
+  threats.push("Le rival peut faire tomber votre bouclier (Sanctuaire sacré) puis vider votre salle (Esprit malveillant). Surveillez la carte et gardez des joueurs prêts.");
+  if (!rooms.length && margin0 < 0) threats.unshift("Ajoute les salles du rival pour obtenir un plan d’attaque précis.");
+
+  const left = `${stock.em} Esprit malveillant, ${stock.sa} Sape d’âme, ${stock.gi} Garde immaculée, ${stock.ss} Sanctuaire sacré`;
+  if (!finale) keep.push(`Il vous restera : ${left}. Ces cartes ne se renouvellent pas pendant la phase éliminatoire.`);
+
+  const diff = myR - enR, gap = rival.a - me.a;
+  const overtake = gap > 0 && diff > 0 ? dur(gap / diff) : null;
+  return { me, rival, T, room, margin0, margin, myR, enR, steps, threats, keep, overtake };
+}
+
+/* ---------- render ---------- */
+$("#run").onclick = () => {
+  const out = $("#out"); out.innerHTML = "";
+  const r = plan();
+  if (r.errs) { const e = el("div", "err"); r.errs.forEach(x => e.append(el("div", null, x))); out.append(e); out.scrollIntoView({ behavior: "smooth" }); return; }
+
+  const win0 = r.margin0 > 0, win = r.margin > 0;
+  const v = el("div", "verdict" + (win ? " win" : ""));
+  v.append(el("h2", null, win0 ? "En tête" : win ? "Rattrapable" : "Très difficile"));
+  v.append(el("p", null, win0
+    ? `Au rythme actuel, vous finissez devant ${r.rival.n} avec ${fmt(r.margin0)} d’avance.`
+    : `Au rythme actuel, ${r.rival.n} finit devant avec ${fmt(-r.margin0)} d’avance.`));
+  if (r.steps.length) v.append(el("p", null, win
+    ? `Avec le plan : vous finissez devant avec environ ${fmt(r.margin)} d’avance (${r.myR.toFixed(1)}/s contre ${r.enR.toFixed(1)}/s)${r.overtake ? `, et vous repassez devant dans ${r.overtake}` : ""}.`
+    : `Même avec le plan, il manquerait environ ${fmt(-r.margin)}. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.`));
+  v.append(el("p", "hint", `Estimation : une salle du rival vaut environ ${r.room.toFixed(1)}/s.`));
+  out.append(v);
+
+  const b = el("div", "box"); b.append(el("h3", null, "Le plan"));
+  if (r.steps.length) {
+    const ol = el("ol", "steps");
+    r.steps.forEach(s => { const li = el("li"); li.append(el("strong", null, s.t), el("span", null, s.d)); if (s.c) { li.append(document.createElement("br"), tag(s.c)); } ol.append(li); });
+    b.append(ol);
+  } else b.append(el("p", null, win0 ? "Rien à attaquer : tenez vos positions et économisez vos cartes." : "Aucune action possible avec les salles et cartes indiquées."));
+  out.append(b);
+
+  [["Cartes", r.keep], ["À surveiller", r.threats]].forEach(([t, list]) => {
+    if (!list.length) return;
+    const x = el("div", "box"); x.append(el("h3", null, t));
+    const ul = el("ul", "plain"); list.forEach(i => ul.append(el("li", null, i))); x.append(ul); out.append(x);
+  });
+  out.scrollIntoView({ behavior: "smooth" });
+};
+</script>
+</body>
+</html>
