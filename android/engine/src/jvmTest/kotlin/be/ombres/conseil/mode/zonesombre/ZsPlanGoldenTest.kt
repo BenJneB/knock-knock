@@ -1,6 +1,7 @@
 package be.ombres.conseil.mode.zonesombre
 
-import be.ombres.conseil.game.*
+import be.ombres.conseil.game.GuildIn
+import be.ombres.conseil.game.Step
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals

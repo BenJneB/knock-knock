@@ -6,6 +6,7 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
+import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -32,7 +33,7 @@ class BitmapScreen private constructor(private val bitmap: Bitmap, override val 
         val b = req.bottom.coerceIn(t + 1, bitmap.height)
         val w = (r - l) * req.scale
         val h = (b - t) * req.scale
-        val out = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val out = createBitmap(w, h)
         val paint = Paint(Paint.FILTER_BITMAP_FLAG)
         if (req.filter == Filter.GRAY) paint.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
         Canvas(out).drawBitmap(bitmap, Rect(l, t, r, b), Rect(0, 0, w, h), paint)

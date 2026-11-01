@@ -15,8 +15,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,14 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import be.ombres.conseil.capture.BubbleService
 import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
 import be.ombres.conseil.mode.Modes
+import be.ombres.conseil.ui.Choice
 import be.ombres.conseil.ui.ConseilTheme
-import be.ombres.conseil.ui.GameHeader
 import be.ombres.conseil.ui.Field
+import be.ombres.conseil.ui.GameHeader
 import be.ombres.conseil.ui.Hint
 import be.ombres.conseil.ui.Section
 import kotlinx.coroutines.Dispatchers
@@ -97,7 +99,7 @@ class MainActivity : ComponentActivity() {
     private fun startBubble() {
         if (!Settings.canDrawOverlays(this)) {
             Toast.makeText(this, "Autorisez « Afficher par-dessus les autres applis », puis revenez.", Toast.LENGTH_LONG).show()
-            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
+            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, "package:$packageName".toUri()))
             return
         }
         if (Build.VERSION.SDK_INT >= 33) notifications.launch(Manifest.permission.POST_NOTIFICATIONS) else askProjection()
@@ -154,6 +156,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     key(mode.id) { mode.Settings(this@MainActivity) }
+                    var mini by remember { mutableStateOf(Prefs.miniPlan(this@MainActivity)) }
+                    Text("Après une lecture par la bulle", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+                    Choice(listOf(true to "Mini-plan sur le jeu", false to "Écran complet"), mini) { mini = it; Prefs.setMiniPlan(this@MainActivity, it) }
                 }
             }
         }

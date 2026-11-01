@@ -4,7 +4,15 @@
 
 import be.ombres.conseil.game.GuildIn
 import be.ombres.conseil.map.MapReader
+import be.ombres.conseil.mode.zonesombre.PlanErrors
+import be.ombres.conseil.mode.zonesombre.PlanInput
+import be.ombres.conseil.mode.zonesombre.PlanOk
+import be.ombres.conseil.mode.zonesombre.RoomIn
+import be.ombres.conseil.mode.zonesombre.emptyPlanText
 import be.ombres.conseil.mode.zonesombre.merge
+import be.ombres.conseil.mode.zonesombre.plan
+import be.ombres.conseil.mode.zonesombre.planText
+import be.ombres.conseil.mode.zonesombre.verdict
 import be.ombres.conseil.ocr.CropRequest
 import be.ombres.conseil.ocr.OcrLine
 import be.ombres.conseil.ocr.OcrPage
@@ -15,14 +23,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
-import be.ombres.conseil.mode.zonesombre.PlanErrors
-import be.ombres.conseil.mode.zonesombre.PlanInput
-import be.ombres.conseil.mode.zonesombre.PlanOk
-import be.ombres.conseil.mode.zonesombre.RoomIn
-import be.ombres.conseil.mode.zonesombre.emptyPlanText
-import be.ombres.conseil.mode.zonesombre.plan
-import be.ombres.conseil.mode.zonesombre.planText
-import be.ombres.conseil.mode.zonesombre.verdict
 
 internal fun str(v: dynamic): String = if (v == null || v == undefined) "" else v.toString()
 
@@ -52,6 +52,7 @@ private fun input(st: dynamic): PlanInput {
 @JsExport
 fun zsPlan(st: dynamic): dynamic = when (val r = plan(input(st))) {
     is PlanErrors -> obj("errs" to r.errs.toTypedArray())
+
     is PlanOk -> {
         val v = verdict(r)
         obj(

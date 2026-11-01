@@ -1,6 +1,13 @@
 package be.ombres.conseil.mode.zonesombre
 
-import be.ombres.conseil.game.*
+import be.ombres.conseil.game.GuildIn
+import be.ombres.conseil.game.Step
+import be.ombres.conseil.game.dur
+import be.ombres.conseil.game.fixed
+import be.ombres.conseil.game.fmt
+import be.ombres.conseil.game.int
+import be.ombres.conseil.game.jsNum
+import be.ombres.conseil.game.parseNum
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
@@ -11,7 +18,6 @@ import kotlin.math.min
  * C'est désormais l'unique moteur : la page web utilise ce même code, compilé en JavaScript et intégré à la page.
  * Les champs restent des chaînes, telles que saisies, pour que les deux interfaces se comportent pareil.
  */
-
 
 data class RoomIn(val n: String = "", val sh: Boolean = false, val b: Boolean = true)
 
@@ -34,7 +40,6 @@ data class PlanInput(
 )
 
 data class Guild(val n: String, val a: Double?, val r: Double?, val s: Int)
-
 
 sealed interface PlanResult
 

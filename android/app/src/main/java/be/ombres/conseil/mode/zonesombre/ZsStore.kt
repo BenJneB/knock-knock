@@ -1,8 +1,9 @@
 package be.ombres.conseil.mode.zonesombre
 
-import be.ombres.conseil.map.*
-import be.ombres.conseil.game.*
 import android.content.Context
+import androidx.core.content.edit
+import be.ombres.conseil.game.GuildIn
+import be.ombres.conseil.map.RoomRead
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -13,7 +14,7 @@ object ZsStore {
     fun load(c: Context): PlanInput =
         sp(c).getString("input", null)?.let { runCatching { fromJson(JSONObject(it)) }.getOrNull() } ?: PlanInput()
 
-    fun save(c: Context, st: PlanInput) = sp(c).edit().putString("input", toJson(st).toString()).apply()
+    fun save(c: Context, st: PlanInput) = sp(c).edit { putString("input", toJson(st).toString()) }
 
     /** Dernière lecture de la carte, pour mesurer la part volée par les voleurs à la lecture suivante. */
     fun loadSnapshot(c: Context): ZsSnapshot? = sp(c).getString("snapshot", null)?.let { s ->
@@ -35,14 +36,16 @@ object ZsStore {
         }.getOrNull()
     }
 
-    fun saveSnapshot(c: Context, snap: ZsSnapshot) = sp(c).edit().putString(
-        "snapshot",
-        JSONObject().put("time", snap.time).put("rates", JSONArray(snap.rates)).put("roomCounts", JSONArray(snap.roomCounts))
-            .put("rooms", JSONArray(snap.rooms.map {
-                JSONObject().put("guild", it.guild ?: JSONObject.NULL).put("dmg", it.dmg ?: "").put("shield", it.shield)
-                    .put("stolen", it.stolen ?: "").put("pos", it.pos).put("x", it.x).put("y", it.y)
-            })).toString(),
-    ).apply()
+    fun saveSnapshot(c: Context, snap: ZsSnapshot) = sp(c).edit {
+        putString(
+            "snapshot",
+            JSONObject().put("time", snap.time).put("rates", JSONArray(snap.rates)).put("roomCounts", JSONArray(snap.roomCounts))
+                .put("rooms", JSONArray(snap.rooms.map {
+                    JSONObject().put("guild", it.guild ?: JSONObject.NULL).put("dmg", it.dmg ?: "").put("shield", it.shield)
+                        .put("stolen", it.stolen ?: "").put("pos", it.pos).put("x", it.x).put("y", it.y)
+                })).toString(),
+        )
+    }
 
     fun toJson(st: PlanInput): JSONObject = JSONObject()
         .put("guilds", JSONArray(st.guilds.map { JSONObject().put("n", it.n).put("a", it.a).put("r", it.r).put("s", it.s) }))

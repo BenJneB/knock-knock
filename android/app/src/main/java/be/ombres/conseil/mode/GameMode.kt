@@ -22,10 +22,16 @@ interface GameMode {
     @Composable
     fun Council(context: Context, report: ReadReport?)
 
+    /** Résumé court du plan (verdict et premières actions), affiché par la bulle sans quitter le jeu. */
+    fun brief(context: Context): Brief
+
     /** Réglages propres au mode, affichés sur l'écran d'accueil. */
     @Composable
     fun Settings(context: Context)
 }
+
+/** Plan en bref : un titre (verdict) et quelques lignes. */
+data class Brief(val title: String, val lines: List<String>)
 
 /** Résumé d'une lecture : ce qui a été lu, ce qui a été repéré, et ce qu'il faut vérifier ou saisir à la main. */
 data class ReadReport(val summary: String, val missing: List<String>, val notes: List<String> = emptyList())

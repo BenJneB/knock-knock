@@ -1,5 +1,6 @@
 package be.ombres.conseil.map
 
+import be.ombres.conseil.game.RoomType
 import be.ombres.conseil.ocr.CropRequest
 import be.ombres.conseil.ocr.Filter
 import be.ombres.conseil.ocr.Hint
@@ -45,10 +46,14 @@ data class RoomRead(
     val pos: String,
     val x: Int,
     val y: Int,
+    /** Type d'après la couleur du sol ; null si incertain. */
+    val type: RoomType? = null,
+    /** Bonus d'efficacité « 50% » affiché près de l'étiquette. */
+    val buff: Boolean = false,
 )
 
-/** Salle libre (« Efficacité en mode inactif X/s »). */
-data class FreeRoom(val rate: String?, val pos: String)
+/** Salle libre (« Efficacité en mode inactif X/s », production d'un joueur). */
+data class FreeRoom(val rate: String?, val pos: String, val type: RoomType? = null, val buff: Boolean = false)
 
 data class MapReading(
     val kind: ScreenKind,
@@ -78,6 +83,7 @@ object MapReader {
     private val SOUL = Regex("(\\d+(?:[.,]\\d+)?)\\s*([KMB])\\b")
     private val SOUL_NOSEP = Regex("(?<![\\d.,])(\\d{4,5})([KMB])\\b")
     private val RATE = Regex("(\\d+(?:[.,]\\d+)?)\\s*/\\s*[s5%$]")
+
     // Deux-points écrit \x3A dans les classes : sur Android (ICU), « [: … :] » est une syntaxe spéciale
     // et fait planter la compilation de l'expression (les tests JVM ne le voient pas).
     private val TIME_HM = Regex("(\\d{1,2})\\s*[\\x3A.]?\\s*h[\\s.,\\x3A]*(\\d{1,2})\\D{0,2}?m[i1l]?n")
@@ -156,24 +162,28 @@ object MapReader {
             val name = Votes<String>()
             val soul = Votes<String>()
             val rate = Votes<String>()
-            for (p in textPages) for (e in p.elements + p.lines) {
-                if (col(e) != c || e.bottom < top || e.top > bottom) continue
-                NAME.find(e.text)?.let { name.add(normName(it.value)) }
-                val s = SOUL.find(e.text)
-                if (s != null) soul.add(s.groupValues[1].replace(',', '.') + s.groupValues[2])
-                else SOUL_NOSEP.find(e.text)?.let { m ->
-                    // Point perdu à la lecture (« 72444K ») : les valeurs ont deux décimales.
-                    val d = m.groupValues[1]
-                    soul.add(d.dropLast(2) + "." + d.takeLast(2) + m.groupValues[2], 0.5)
+            for (p in textPages) {
+                for (e in p.elements + p.lines) {
+                    if (col(e) != c || e.bottom < top || e.top > bottom) continue
+                    NAME.find(e.text)?.let { name.add(normName(it.value)) }
+                    val s = SOUL.find(e.text)
+                    if (s != null) soul.add(s.groupValues[1].replace(',', '.') + s.groupValues[2])
+                    else SOUL_NOSEP.find(e.text)?.let { m ->
+                        // Point perdu à la lecture (« 72444K ») : les valeurs ont deux décimales.
+                        val d = m.groupValues[1]
+                        soul.add(d.dropLast(2) + "." + d.takeLast(2) + m.groupValues[2], 0.5)
+                    }
+                    RATE.find(e.text)?.let { rate.add(it.groupValues[1].replace(',', '.')) }
                 }
-                RATE.find(e.text)?.let { rate.add(it.groupValues[1].replace(',', '.')) }
             }
             val slots = ROOM_SLOTS.map { frac ->
                 val x = c * cw + frac * cw
                 val v = Votes<Int>()
-                for (p in roomPages) for (e in p.elements) {
-                    if (e.cy < stripTop || e.cy > stripBottom || kotlin.math.abs(e.cx - x) > 0.06 * cw) continue
-                    v.add(digits(e.text))
+                for (p in roomPages) {
+                    for (e in p.elements) {
+                        if (e.cy < stripTop || e.cy > stripBottom || kotlin.math.abs(e.cx - x) > 0.06 * cw) continue
+                        v.add(digits(e.text))
+                    }
                 }
                 v.best()
             }
@@ -195,7 +205,7 @@ object MapReader {
     /** Bleu clair de la bulle de bouclier (le sol de la carte est violet : g < r). */
     private fun cyan(r: Int, g: Int, b: Int) = g > r + 30 && b > r + 50 && b >= g - 15
 
-    private class Label(val left: Int, val top: Int, val bottom: Int)
+    private class Label(val left: Int, val top: Int, val bottom: Int, val text: String)
 
     private suspend fun readMap(screen: Screen, banner: Banner, ourGuild: String?, known: List<String>): Pair<List<RoomRead>, List<FreeRoom>> {
         val page = screen.page
@@ -211,7 +221,7 @@ object MapReader {
         val labels = mutableListOf<Label>()
         for (l in lines.filter { DMG.containsMatchIn(it.text) || fold(it.text).startsWith("dmg") }) {
             // Deux étiquettes sont toujours bien plus éloignées que ça : au-delà, c'est la même lue deux fois.
-            if (labels.none { kotlin.math.abs(it.left - l.left) < d(90) && kotlin.math.abs(it.top - l.top) < d(25) }) labels.add(Label(l.left, l.top, l.bottom))
+            if (labels.none { kotlin.math.abs(it.left - l.left) < d(90) && kotlin.math.abs(it.top - l.top) < d(25) }) labels.add(Label(l.left, l.top, l.bottom, l.text))
         }
         val unread = banner.guilds.count { it.name == null }
         val names = banner.guilds.mapIndexed { i, g ->
@@ -219,7 +229,7 @@ object MapReader {
         }
         val suffixes = names.map { n -> n?.substringAfter('-')?.let { key(it) }?.takeIf { it.isNotEmpty() } }
 
-        val rooms = labels.map { lab ->
+        val labelled = labels.map { lab ->
             // Nom de la guilde : juste au-dessus de la ligne DMG.
             val nameLine = lines.filter { it.bottom in (lab.top - d(40))..(lab.top + d(4)) && it.right > lab.left && it.left < lab.left + d(120) }
             val guild = suffixes.indices.firstOrNull { i ->
@@ -246,8 +256,17 @@ object MapReader {
             val stolen = stolenVotes.best()
             val cx = lab.left + d(30)
             val cy = lab.top + d(90)
-            RoomRead(guild, dmg, shield, stolen, position(cx, cy, w, mapTop, mapBottom), cx, cy)
+            val type = floorType(screen, cx, lab.top + d(150), d(40))
+            // Bonus : badge « 50% » au bout de l'étiquette, juste sous elle.
+            val buff = lines.any { BUFF.containsMatchIn(it.text) && it.left in lab.left + d(80)..lab.left + d(280) && it.top in lab.top - d(10)..lab.top + d(70) }
+            RoomRead(guild, dmg, shield, stolen, position(cx, cy, w, mapTop, mapBottom), cx, cy, type, buff)
         }
+
+        // Étiquette sans nom lisible : si une seule guilde a moins de salles vues que de salles annoncées
+        // dans le bandeau, c'est la sienne.
+        val announced = banner.guilds.map { it.rooms }
+        val missing = announced.indices.filter { i -> announced[i] != null && labelled.count { it.guild == i } < announced[i]!! }
+        val rooms = if (missing.size == 1) labelled.map { if (it.guild == null) it.copy(guild = missing[0]) else it } else labelled
 
         // Salles libres : « Efficacité en mode inactif », avec la production juste en dessous.
         val freeLines = mutableListOf<OcrLine>()
@@ -257,14 +276,42 @@ object MapReader {
         val free = freeLines.map { f ->
             val rate = lines.firstOrNull { it.top in f.top..f.bottom + d(45) && kotlin.math.abs(it.cx - f.cx) < d(60) && FREE_RATE.containsMatchIn(it.text) }
                 ?.let { FREE_RATE.find(it.text)!!.groupValues[1].replace(',', '.') }
-            FreeRoom(rate, position(f.cx, f.cy + d(100), w, mapTop, mapBottom))
+            val type = floorType(screen, f.cx, f.bottom + d(130), d(40))
+            val buff = lines.any { BUFF.containsMatchIn(it.text) && it.cx in f.left - d(20)..f.right + d(120) && it.top in f.bottom..f.bottom + d(90) }
+            FreeRoom(rate, position(f.cx, f.cy + d(100), w, mapTop, mapBottom), type, buff)
         }
         return rooms to free
     }
 
+    // « 50% », parfois lu « 502 » ou « 505 ».
+    private val BUFF = Regex("(?<![\\d.,])50\\s?[%25](?![\\d.,])")
+
+    /**
+     * Type d'une salle d'après la couleur moyenne de son sol (zone de ±[half] autour de x, y) :
+     * suprême rosé (rouge nettement au-dessus du bleu), basique gris (vert au moins égal au rouge), intermédiaire violet.
+     */
+    private fun floorType(screen: Screen, x: Int, y: Int, half: Int): RoomType? {
+        var r = 0L; var g = 0L; var b = 0L; var n = 0
+        val px = screen.pixels
+        for (yy in (y - half).coerceAtLeast(0) until (y + half).coerceAtMost(px.height) step 3) {
+            for (xx in (x - half).coerceAtLeast(0) until (x + half).coerceAtMost(px.width) step 3) {
+                val c = px.rgb(xx, yy)
+                r += (c shr 16) and 255; g += (c shr 8) and 255; b += c and 255; n++
+            }
+        }
+        if (n == 0) return null
+        val (ar, ag, ab) = Triple(r / n, g / n, b / n)
+        return when {
+            ar > ab + 20 && ar > 150 -> RoomType.SUPREME
+            ag >= ar - 2 -> RoomType.BASIC
+            ab > ar + 5 -> RoomType.INTERMEDIATE
+            else -> null
+        }
+    }
+
     private suspend fun readDmg(screen: Screen, lab: Label, d: (Int) -> Int): String? {
         val variants = listOf(3 to Filter.COLOR, 3 to Filter.GRAY, 4 to Filter.COLOR, 2 to Filter.COLOR, 2 to Filter.GRAY, 5 to Filter.COLOR)
-        val texts = variants.flatMap { (scale, f) ->
+        val texts = listOf(lab.text) + variants.flatMap { (scale, f) ->
             screen.ocr(CropRequest(lab.left - d(10), lab.top - d(8), lab.left + d(190), lab.bottom + d(8), scale, f, Hint.DMG)).lines.map { it.text }
         }
         return parseDmg(texts)
@@ -287,13 +334,24 @@ object MapReader {
             }
             when {
                 unit.isEmpty() -> if (num == "0") votes.add("0", weight)
+
                 num.contains('.') -> votes.add(num + unit, weight)
+
                 // Point perdu à la lecture (« 141B ») : les valeurs ont deux décimales.
                 num.length >= 3 -> votes.add(num.dropLast(2) + "." + num.takeLast(2) + unit, 0.5 * weight)
+
                 else -> votes.add(num + unit, 0.5 * weight)
             }
         }
-        return votes.best()
+        return votes.bestWithDroppedOnes()
+    }
+
+    /**
+     * Le « 1 », trait fin, disparaît souvent dans les zones agrandies (« 79.65M » pour 791.65M) :
+     * une valeur qui ne diffère d'une autre que par un « 1 » manquant lui apporte ses voix.
+     */
+    private fun Votes<String>.bestWithDroppedOnes(): String? = bestMerged { long, short ->
+        long.length == short.length + 1 && long.indices.any { i -> long[i] == '1' && long.removeRange(i, i + 1) == short }
     }
 
     private fun position(x: Int, y: Int, w: Int, top: Int, bottom: Int): String {

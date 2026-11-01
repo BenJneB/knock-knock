@@ -3,6 +3,17 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+// Clé de signature des versions à distribuer : variables d'environnement (GitHub Actions) ou, en local,
+// ~/.gradle/gradle.properties (conseil.keystore=…, etc.). Créer la clé : tools/creer-cle.sh.
+fun signing(name: String): String? =
+    providers.environmentVariable("CONSEIL_" + name.uppercase()).orNull
+        ?: providers.gradleProperty("conseil.$name").orNull
+val keystore = signing("keystore")?.let { file(it) }?.takeIf { it.isFile }
+
+// Numéro de version : le numéro du passage GitHub Actions, pour que chaque APK distribué s'installe par-dessus
+// le précédent (1 en local).
+val build = providers.environmentVariable("GITHUB_RUN_NUMBER").orNull?.toIntOrNull() ?: 1
+
 android {
     namespace = "be.ombres.conseil"
     compileSdk = 37
@@ -10,9 +21,9 @@ android {
     defaultConfig {
         applicationId = "be.ombres.conseil"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        targetSdk = 37
+        versionCode = build
+        versionName = "0.2.$build"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,13 +39,22 @@ android {
         }
     }
 
+    signingConfigs {
+        if (keystore != null) create("release") {
+            storeFile = keystore
+            storePassword = signing("keystore_password")
+            keyAlias = signing("key_alias")
+            keyPassword = signing("key_password")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // APK installé hors Play Store : signé avec la clé de debug tant qu'aucune clé n'est fournie.
-            signingConfig = signingConfigs.getByName("debug")
+            // Vraie clé si elle est fournie ; sinon clé de debug (constructions locales, pull requests).
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
         }
     }
 
@@ -45,6 +65,14 @@ android {
 
     // Les captures du jeu servent de données au test instrumenté de lecture (OcrDumpTest).
     sourceSets.getByName("androidTest").assets.directories.add("../../captures")
+
+    // Android Lint : tout avertissement fait échouer la vérification (CI comprise), sauf les règles qui signalent
+    // une version plus récente disponible (elles changent avec le temps, sans changement du code).
+    lint {
+        warningsAsErrors = true
+        abortOnError = true
+        disable += setOf("NewerVersionAvailable", "GradleDependency", "AndroidGradlePluginVersion", "OldTargetApi")
+    }
 
     buildFeatures {
         compose = true

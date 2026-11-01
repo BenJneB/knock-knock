@@ -1,7 +1,12 @@
 package be.ombres.conseil.mode.zonesombre
-
-import be.ombres.conseil.map.*
-import be.ombres.conseil.game.*
+import be.ombres.conseil.game.int
+import be.ombres.conseil.game.jsNum
+import be.ombres.conseil.game.parseNum
+import be.ombres.conseil.map.MapReading
+import be.ombres.conseil.map.ScreenKind
+import be.ombres.conseil.map.mergeBanner
+import be.ombres.conseil.map.roomCountChecks
+import be.ombres.conseil.map.short
 
 /** Ce qu'une capture a apporté : les valeurs mises à jour, et un résumé pour l'utilisateur. */
 data class ZsMergeResult(val input: PlanInput, val summary: String, val missing: List<String>, val notes: List<String> = emptyList())

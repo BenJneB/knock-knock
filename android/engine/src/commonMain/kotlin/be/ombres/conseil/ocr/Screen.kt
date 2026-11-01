@@ -4,8 +4,10 @@ package be.ombres.conseil.ocr
 enum class Filter {
     COLOR,
     GRAY,
+
     /** Ne garde que le texte blanc (seuil 170), en noir sur fond blanc. */
     WHITE170,
+
     /** Idem, seuil 200. */
     WHITE200,
 }
@@ -32,10 +34,12 @@ interface Pixels {
     fun fraction(left: Int, top: Int, right: Int, bottom: Int, test: (r: Int, g: Int, b: Int) -> Boolean): Double {
         var tot = 0
         var hit = 0
-        for (y in maxOf(0, top) until minOf(height, bottom) step 2) for (x in maxOf(0, left) until minOf(width, right) step 2) {
-            val c = rgb(x, y)
-            tot++
-            if (test((c shr 16) and 255, (c shr 8) and 255, c and 255)) hit++
+        for (y in maxOf(0, top) until minOf(height, bottom) step 2) {
+            for (x in maxOf(0, left) until minOf(width, right) step 2) {
+                val c = rgb(x, y)
+                tot++
+                if (test((c shr 16) and 255, (c shr 8) and 255, c and 255)) hit++
+            }
         }
         return if (tot == 0) 0.0 else hit.toDouble() / tot
     }
