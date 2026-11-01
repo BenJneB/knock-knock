@@ -1,10 +1,11 @@
-# Tests à chaque push et pull request, puis pages web et APK téléchargeables (onglet Actions, artefacts).
+# Tests à chaque pull request, puis pages web et APK téléchargeables (onglet Actions, artefacts).
+# Lançable aussi à la main (Actions > Tests > Run workflow), par exemple pour construire l'APK depuis master.
 # Gratuit : illimité sur un dépôt public, dans les 2 000 minutes mensuelles offertes sur un dépôt privé.
 name: Tests
 
 on:
-  push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   tests:
@@ -52,7 +53,7 @@ jobs:
             echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/conseil.jks"
             echo "CONSEIL_KEYSTORE=$RUNNER_TEMP/conseil.jks" >> "$GITHUB_ENV"
           else
-            echo "::warning::Secrets de signature absents : APK signé avec une clé de debug (voir tools/creer-cle.sh)."
+            echo "::notice::Secrets de signature absents : APK signé avec une clé de debug (voir tools/creer-cle.sh)."
           fi
 
       - name: Style du code (ktlint) et Android Lint

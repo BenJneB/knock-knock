@@ -34,7 +34,7 @@ Un APK par type de processeur : `arm64-v8a` pour presque tous les téléphones (
 
 ## Distribuer l'appli aux chefs
 
-À chaque push, GitHub construit l'APK et le propose en téléchargement : onglet *Actions*, dernier passage,
+À chaque pull request (ou à la main : Actions > Tests > Run workflow), GitHub construit l'APK et le propose en téléchargement : onglet *Actions*, dernier passage,
 artefact « apk-android » (`app-arm64-v8a-release.apk` pour presque tous les téléphones,
 `app-armeabi-v7a-release.apk` pour les plus anciens). Le numéro de version suit le numéro du passage, pour que
 chaque nouvel APK s'installe par-dessus le précédent.
@@ -61,7 +61,7 @@ node ../tools/check-web-engine.mjs   # vérifie la version JavaScript sur les m�
 
 Les pages à utiliser (`web/dist/*.html`) sont générées par `./gradlew :engine:webPage` à partir des
 sources de `web/src/` ; elles ne sont pas versionnées. Elles sont aussi assemblées par GitHub à chaque
-push : artefact « pages-web » du passage, dans l'onglet *Actions*. Un dossier par mode, et ce que les pages partagent dans `commun/` ;
+pull request : artefact « pages-web » du passage, dans l'onglet *Actions*. Un dossier par mode, et ce que les pages partagent dans `commun/` ;
 chaque page inclut ce dont elle a besoin (`/* inclure:commun/script.js */`, `<!-- inclure:commun/guildes.html -->`…).
 
 ```
@@ -123,7 +123,7 @@ ajouté à `Modes.all`).
   manifeste). `tools/verifier-autorisations.sh` le vérifie dans la CI : toute autorisation inattendue la fait échouer.
 - **Captures** : seule la dernière lecture est gardée, dans le cache privé de l'appli ; elle n'est envoyée que si
   l'utilisateur touche « Signaler une lecture ratée ».
-- **CI « Sécurité »** (`.github/workflows/securite.yml`, chaque push sur master et chaque lundi) : CodeQL sur le
+- **CI « Sécurité »** (`.github/workflows/securite.yml`, chaque pull request et chaque lundi) : CodeQL sur le
   Kotlin et le JavaScript, OSV-Scanner sur les outils JavaScript (`kotlin-js-store/yarn.lock`). Les versions corrigées
   forcées sont listées dans `android/build.gradle.kts`.
 - **Dependabot** (`.github/dependabot.yml`) propose chaque semaine les mises à jour des dépendances Gradle et des actions.

@@ -6,9 +6,8 @@
 name: Sécurité
 
 on:
-  push:
-    branches: [master]
   pull_request:
+  workflow_dispatch:
   schedule:
     - cron: "0 6 * * 1" # chaque lundi : nouvelles failles publiées depuis
 
@@ -22,6 +21,10 @@ jobs:
     permissions:
       security-events: write
       contents: read
+    env:
+      # Kotlin se compile (mode « manual ») : l'analyse rapide « overlay » n'existe que sans compilation. On ne la
+      # tente pas, ce qui évite l'avertissement ; valeur vide (ignorée) pour le JavaScript, qui la garde.
+      CODEQL_OVERLAY_DATABASE_MODE: ${{ matrix.build-mode == 'manual' && 'none' || '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -62,11 +65,24 @@ jobs:
           category: /language:${{ matrix.language }}
 
   dependances-js:
+    runs-on: ubuntu-24.04 # fixé : un changement d'image ne doit pas casser la CI sans prévenir
     permissions:
       security-events: write
       contents: read
-      actions: read
-    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.7.0
-    with:
-      scan-args: |-
-        --lockfile=android/kotlin-js-store/yarn.lock
+    steps:
+      - uses: actions/checkout@v7
+
+      # Version exacte : le comportement de l'action peut changer d'une version mineure à l'autre.
+      # Échoue si une dépendance a une faille connue ; les résultats vont aussi dans l'onglet Security.
+      - uses: google/osv-scanner-action/osv-scanner-action@v2.7.0
+        with:
+          scan-args: |-
+            --format=sarif
+            --output=osv.sarif
+            --lockfile=android/kotlin-js-store/yarn.lock
+
+      - uses: github/codeql-action/upload-sarif@v4
+        if: always() && hashFiles('osv.sarif') != ''
+        with:
+          sarif_file: osv.sarif
+          category: osv-scanner

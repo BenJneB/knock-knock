@@ -3,6 +3,8 @@
  * petits utilitaires d'affichage et lecture d'une capture dans le navigateur avec Tesseract.js.
  * Le lecteur et le moteur sont ceux de l'appli (module android/engine, intégré dans chaque page).
  */
+// Définis par la page (STORE, DEF, st) ou chargés avant ce script (moteur « conseil », Tesseract.js).
+/* global STORE, DEF, st:writable, conseil, Tesseract */
 const $ = s => document.querySelector(s);
 
 // Pastille de coût, avec l'icône des cartes citées (« 1 Sanctuaire sacré + 1 Esprit malveillant »).

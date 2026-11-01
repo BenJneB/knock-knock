@@ -1,4 +1,6 @@
 // Script de la page capitale (assemblée par « ./gradlew :engine:webPage »). Code commun : ../commun/script.js.
+// Fournis par le moteur (conseil) et par ../commun/script.js, inclus avant ce script dans la page assemblée.
+/* global conseil, $, el, tag, load, save, drawGuilds, drawFields, roomKindHtml, readCapture, showErrors, planBox, listBox */
 const STORE = "dc-chefs-v1";
 const DEF = { guilds:[{n:"s40-Ombres",a:"",r:"",s:""},{n:"",a:"",r:"",s:""},{n:"",a:"",r:"",s:""}], me:0,
   th:"", tm:"", attempts:"1", ourDmg:"", rooms:[], ourRooms:[] };
