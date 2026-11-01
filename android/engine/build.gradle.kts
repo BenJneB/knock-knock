@@ -30,8 +30,8 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
-        jsMain.dependencies {
-            // Lecture d'une capture dans la page : appels asynchrones vers Tesseract.js (promesses).
+        // Lecture d'une capture : zones lues en parallèle (ML Kit sur Android, Tesseract.js dans la page, via des promesses).
+        commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
         }
         jvmMain.dependencies {

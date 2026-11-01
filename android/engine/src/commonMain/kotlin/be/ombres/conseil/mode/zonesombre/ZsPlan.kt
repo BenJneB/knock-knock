@@ -116,35 +116,27 @@ fun plan(st: PlanInput): PlanResult {
     // Prendre une salle : sa production passe du rival à nous (compte double) ; Sape : une part pendant 2 h.
     fun take(r: Room) = 2 * r.value * T
     fun sapeGain(r: Room) = 2 * p * r.value * min(7200, T)
-    fun need() = (if (finale) safety * 2 else safety) - margin
+    val target = if (finale) safety * 2 else safety
+
+    // Les autres guildes comptent aussi : une salle prise au rival ne leur coûte rien, elle ne compte que simple
+    // contre elles (la moitié du gain sur le rival), une salle libre compte pareil contre toutes.
+    val othersMargin0 = others.filter { it !== rival }.map { it to fin(me) - fin(it) }
+    var myGain = 0.0 // ce que le plan ajoute à notre Âme finale
+    fun need(extra: Double = 0.0) = max(
+        target - (margin + extra),
+        othersMargin0.maxOfOrNull { (_, m0) -> target - (m0 + myGain + extra / 2) } ?: Double.NEGATIVE_INFINITY,
+    )
     var freeLeft = int(st.free)
 
     fun cost(vararg kv: Pair<String, Int>) = linkedMapOf(*kv)
-    fun candidates(): List<Candidate> {
-        val c = mutableListOf<Candidate>()
-        rooms.filter { !it.used }.forEach { r ->
-            if (r.b && !r.sh) c.add(Candidate(r, cost(), take(r), "combat"))
-            if (r.b && r.sh) c.add(Candidate(r, cost("ss" to 1), take(r), "ss-combat"))
-            if (!r.b && !r.sh) c.add(Candidate(r, cost("em" to 1), take(r), "em"))
-            if (!r.b && r.sh) c.add(Candidate(r, cost("ss" to 1, "em" to 1), take(r), "ss-em"))
-            if (!r.sh) c.add(Candidate(r, cost("sa" to 1), sapeGain(r), "sape"))
-        }
-        if (freeLeft > 0) c.add(Candidate(null, cost(), freeV * T, "free"))
-        return c.filter { x -> x.cost.all { (k, v) -> stock[k]!! >= v } && x.cost.values.sum() <= budget }
-    }
-    fun score(x: Candidate): Double {
-        val n = x.cost.values.sum()
-        return if (n == 0) 1e15 + x.gain else x.gain / n
-    }
-
-    while (need() > 0) {
-        val c = candidates().sortedByDescending { score(it) }.firstOrNull() ?: break
+    fun apply(c: Candidate) {
         c.cost.forEach { (k, v) -> repeat(v) { use(k) } }
         margin += c.gain
         c.r?.used = true
-        if (c.kind == "free") { freeLeft--; myR += freeV; steps.add(Step("Occuper une salle libre", "Production gratuite : +${jsNum(freeV)}/s pour vous.", "")); continue }
+        if (c.kind == "free") { freeLeft--; myR += freeV; myGain += c.gain; steps.add(Step("Occuper une salle libre", "Production gratuite : +${jsNum(freeV)}/s pour vous.", "")); return }
+        myGain += c.gain / 2
         val n = c.r!!.n
-        if (c.kind == "sape") { steps.add(Step("Sape d’âme sur $n", "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.", "1 Sape d’âme")); continue }
+        if (c.kind == "sape") { steps.add(Step("Sape d’âme sur $n", "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.", "1 Sape d’âme")); return }
         myR += c.r.value; enR -= c.r.value
         when (c.kind) {
             "combat" -> steps.add(Step("Attaquer $n en combat", "Salle battable sans bouclier : aucune carte nécessaire. Vous gagnez sa production et le rival la perd.", ""))
@@ -154,10 +146,21 @@ fun plan(st: PlanInput): PlanResult {
         }
     }
 
+    // 2a. Actions gratuites d'abord (combat sur salle battable sans bouclier, salle libre), la plus rentable en premier.
+    while (need() > 0) {
+        val c = mutableListOf<Candidate>()
+        rooms.filter { !it.used && it.b && !it.sh }.forEach { c.add(Candidate(it, cost(), take(it), "combat")) }
+        if (freeLeft > 0) c.add(Candidate(null, cost(), freeV * T, "free"))
+        apply(c.maxByOrNull { it.gain } ?: break)
+    }
+
+    // 2b. Cartes : recherche exhaustive de la meilleure combinaison (au plus une action par salle).
+    if (need() > 0) bestCards(rooms, stock, budget, ::take, ::sapeGain, ::need).forEach(::apply)
+
     // 3. En finale, les cartes restantes ne servent plus à rien : on vide les Sapes
     if (finale) {
         rooms.filter { !it.used && !it.sh }.forEach { r ->
-            if (stock["sa"]!! > 0 && budget > 0) { use("sa"); r.used = true; margin += sapeGain(r); steps.add(Step("Sape d’âme sur ${r.n}", "C’est la finale : les cartes non jouées seront perdues, autant les utiliser.", "1 Sape d’âme")) }
+            if (stock["sa"]!! > 0 && budget > 0) { use("sa"); r.used = true; margin += sapeGain(r); myGain += sapeGain(r) / 2; steps.add(Step("Sape d’âme sur ${r.n}", "C’est la finale : les cartes non jouées seront perdues, autant les utiliser.", "1 Sape d’âme")) }
         }
     }
 
@@ -165,6 +168,10 @@ fun plan(st: PlanInput): PlanResult {
     // (plus aucune carte jouable aujourd’hui : inutile de proposer un Sanctuaire sacré)
     if (stock["ss"]!! > 0 && budget > 0) threats.add("Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.")
     threats.add("Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.")
+    othersMargin0.forEach { (g, m0) ->
+        val m = m0 + myGain
+        if (m < 0) threats.add("${g.n} finirait aussi devant vous (environ ${fmt(-m)} d’avance) : le plan vise surtout ${rival.n}, prendre des salles à ${g.n} compterait double contre elle.")
+    }
     if (rooms.isEmpty() && margin0 < 0) threats.add(0, "Ajoute les salles du rival pour obtenir un plan d’attaque précis.")
 
     val left = "${stock["em"]} Esprit malveillant, ${stock["sa"]} Sape d’âme, ${stock["gi"]} Garde immaculée, ${stock["ss"]} Sanctuaire sacré"
@@ -174,6 +181,79 @@ fun plan(st: PlanInput): PlanResult {
     val gap = rival.a!! - me.a!!
     val overtake = if (gap > 0 && diff > 0) dur(gap / diff) else null
     return PlanOk(me, rival, T, room, margin0, margin, myR, enR, steps, threats, keep, overtake)
+}
+
+/**
+ * Meilleure combinaison de cartes sur les salles encore libres (au plus une action par salle), dans la limite du stock
+ * et du [budget] du jour : la moins chère qui suffit ([need] ≤ 0 une fois son gain ajouté), en épargnant d'abord les
+ * Esprits malveillants (les plus rares), puis les Sanctuaires ; si aucune ne suffit, celle qui rapporte le plus.
+ * Programmation dynamique sur les salles, par nombre de cartes de chaque sorte (au plus 2 × 10 × 6 états au départ).
+ * Les actions sont rendues de la plus rentable par carte à la moins rentable.
+ */
+private fun bestCards(
+    rooms: List<Room>,
+    stock: Map<String, Int>,
+    budget: Int,
+    take: (Room) -> Double,
+    sape: (Room) -> Double,
+    need: (Double) -> Double,
+): List<Candidate> {
+    val nE = stock["em"]!! + 1
+    val nS = stock["sa"]!! + 1
+    val nX = stock["ss"]!! + 1
+    fun idx(e: Int, s: Int, x: Int) = (e * nS + s) * nX + x
+    val opts = rooms.filter { !it.used }.map { r ->
+        buildList {
+            if (r.b && r.sh) add(Candidate(r, linkedMapOf("ss" to 1), take(r), "ss-combat"))
+            if (!r.b && !r.sh) add(Candidate(r, linkedMapOf("em" to 1), take(r), "em"))
+            if (!r.b && r.sh) add(Candidate(r, linkedMapOf("ss" to 1, "em" to 1), take(r), "ss-em"))
+            if (!r.sh) add(Candidate(r, linkedMapOf("sa" to 1), sape(r), "sape"))
+        }
+    }
+    fun Candidate.n(k: String) = cost[k] ?: 0
+
+    // best[état] : meilleur gain avec exactement e Esprits, s Sapes, x Sanctuaires ; choices[salle][état] : option retenue.
+    var best = DoubleArray(nE * nS * nX) { Double.NEGATIVE_INFINITY }.also { it[0] = 0.0 }
+    val choices = opts.map { os ->
+        val next = best.copyOf()
+        val ch = IntArray(next.size) { -1 }
+        for (e in 0 until nE) {
+            for (s in 0 until nS) {
+                for (x in 0 until nX) {
+                    val g0 = best[idx(e, s, x)]
+                    if (g0 == Double.NEGATIVE_INFINITY) continue
+                    os.forEachIndexed { k, o ->
+                        val (e2, s2, x2) = Triple(e + o.n("em"), s + o.n("sa"), x + o.n("ss"))
+                        if (e2 >= nE || s2 >= nS || x2 >= nX || e2 + s2 + x2 > budget) return@forEachIndexed
+                        val i2 = idx(e2, s2, x2)
+                        if (g0 + o.gain > next[i2]) { next[i2] = g0 + o.gain; ch[i2] = k }
+                    }
+                }
+            }
+        }
+        best = next
+        ch
+    }
+
+    val states = mutableListOf<Triple<Int, Int, Int>>()
+    for (e in 0 until nE) for (s in 0 until nS) for (x in 0 until nX) if (best[idx(e, s, x)] > Double.NEGATIVE_INFINITY) states.add(Triple(e, s, x))
+    fun gain(t: Triple<Int, Int, Int>) = best[idx(t.first, t.second, t.third)]
+    fun cards(t: Triple<Int, Int, Int>) = t.first + t.second + t.third
+    val enough = states.filter { need(gain(it)) <= 0 }
+    val pick = if (enough.isNotEmpty()) enough.minWith(compareBy({ cards(it) }, { it.first }, { it.third }))
+    else states.minWith(compareBy({ -gain(it) }, { cards(it) }, { it.first }, { it.third }))
+
+    // Remontée des choix, de la dernière salle à la première.
+    var (e, s, x) = pick
+    val chosen = mutableListOf<Candidate>()
+    for (i in opts.indices.reversed()) {
+        val k = choices[i][idx(e, s, x)]
+        if (k < 0) continue
+        val o = opts[i][k]
+        chosen.add(0, o)
+        e -= o.n("em"); s -= o.n("sa"); x -= o.n("ss")
+    }
+    return chosen.sortedByDescending { it.gain / it.cost.values.sum() }
 }
 
 /* ---------- textes du verdict (repris du rendu de la version web) ---------- */

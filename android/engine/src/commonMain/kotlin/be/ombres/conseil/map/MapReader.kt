@@ -12,6 +12,10 @@ import be.ombres.conseil.ocr.digits
 import be.ombres.conseil.ocr.fold
 import be.ombres.conseil.ocr.levenshtein
 import be.ombres.conseil.ocr.median
+import be.ombres.conseil.ocr.ocrAll
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 /*
  * Lecture des captures de la carte du match (bandeau, temps, salles) et du coffre de cartes,
@@ -143,18 +147,17 @@ object MapReader {
         fun band(scale: Int, f: Filter) = CropRequest(0, top, w, bottom, scale, f)
         fun strip(scale: Int, f: Filter) = CropRequest(0, stripTop, w, stripBottom, scale, f, Hint.DIGITS)
 
-        val textPages = listOf(page) + listOf(
+        val bands = listOf(
             band(2, Filter.COLOR), band(2, Filter.GRAY), band(3, Filter.COLOR), band(3, Filter.GRAY),
             band(2, Filter.WHITE170), band(3, Filter.WHITE170),
-        ).map { screen.ocr(it) }
-        val roomPages = listOf(textPages[5], textPages[6]) + listOf(
-            strip(2, Filter.WHITE200), strip(3, Filter.WHITE200), strip(2, Filter.WHITE170),
-        ).map { screen.ocr(it) } + (0..2).flatMap { c ->
+        )
+        val strips = listOf(strip(2, Filter.WHITE200), strip(3, Filter.WHITE200), strip(2, Filter.WHITE170)) + (0..2).flatMap { c ->
             // Une colonne à la fois, plus agrandie : aide pour les « 0 » isolés.
-            listOf(Filter.WHITE200, Filter.WHITE170).map { f ->
-                screen.ocr(CropRequest(c * w / 3, stripTop, (c + 1) * w / 3, stripBottom, 4, f, Hint.DIGITS))
-            }
+            listOf(Filter.WHITE200, Filter.WHITE170).map { f -> CropRequest(c * w / 3, stripTop, (c + 1) * w / 3, stripBottom, 4, f, Hint.DIGITS) }
         }
+        val read = screen.ocrAll(bands + strips)
+        val textPages = listOf(page) + read.take(bands.size)
+        val roomPages = listOf(textPages[5], textPages[6]) + read.drop(bands.size)
 
         val cw = w / 3.0
         fun col(e: OcrLine) = (e.cx / cw).toInt().coerceIn(0, 2)
@@ -232,40 +235,7 @@ object MapReader {
         }
         val suffixes = names.map { n -> n?.substringAfter('-')?.let { key(it) }?.takeIf { it.isNotEmpty() } }
 
-        val labelled = labels.map { lab ->
-            // Nom de la guilde : juste au-dessus de la ligne DMG.
-            val nameLine = lines.filter { it.bottom in (lab.top - d(40))..(lab.top + d(4)) && it.right > lab.left && it.left < lab.left + d(120) }
-            val guild = suffixes.indices.firstOrNull { i ->
-                val sfx = suffixes[i] ?: return@firstOrNull false
-                nameLine.any { n -> key(n.text).let { t -> t.contains(sfx) || (t.length >= sfx.length && levenshtein(t.takeLast(sfx.length), sfx) <= 1) } }
-            }
-            val dmg = readDmg(screen, lab, ::d)
-            // Corps de la salle, d'après la position de l'étiquette.
-            val l = lab.left - d(75)
-            val r = lab.left + d(135)
-            val t = lab.top - d(35)
-            val b = lab.top + d(212)
-            val sides = listOf(
-                screen.pixels.fraction(l - d(50), t + d(60), l - d(5), b, ::cyan),
-                screen.pixels.fraction(r + d(5), t + d(60), r + d(50), b, ::cyan),
-            )
-            val shield = sides.average() >= 0.12
-            // Voleur : « Volé » et le montant volé, au coin bas gauche de la salle. Sous une bulle de bouclier,
-            // seul le montant est lisible : un montant en K/M à cet endroit suffit.
-            val stolenVotes = Votes<String>()
-            lines.filter { kotlin.math.abs(it.left - l) < d(90) && kotlin.math.abs(it.top - b) < d(90) }.forEach { a ->
-                SOUL.find(a.text)?.let { m -> stolenVotes.add(m.groupValues[1].replace(',', '.') + m.groupValues[2]) }
-            }
-            val stolen = stolenVotes.best()
-            val cx = lab.left + d(30)
-            val cy = lab.top + d(90)
-            val type = floorType(screen, cx, lab.top + d(150), d(40))
-            // Bonus : badge « 50% » au bout de l'étiquette, juste sous elle. Lu comme texte, ou repéré à sa couleur
-            // vert d'eau quand le texte est mal lu (pas sous une bulle de bouclier, qui le teinte en cyan).
-            val buff = lines.any { BUFF.containsMatchIn(it.text) && it.left in lab.left + d(80)..lab.left + d(280) && it.top in lab.top - d(10)..lab.top + d(70) } ||
-                screen.pixels.fraction(cx + d(30), cy - d(68), cx + d(125), cy - d(12), ::mint) >= 0.04
-            RoomRead(guild, dmg, shield, stolen, position(cx, cy, w, mapTop, mapBottom), cx, cy, type, buff)
-        }
+        val labelled = coroutineScope { labels.map { lab -> async { readRoom(screen, lab, lines, suffixes, ::d, w, mapTop, mapBottom) } }.awaitAll() }
 
         // Étiquette sans nom lisible : si une seule guilde a moins de salles vues que de salles annoncées
         // dans le bandeau, c'est la sienne.
@@ -286,6 +256,44 @@ object MapReader {
             FreeRoom(rate, position(f.cx, f.cy + d(100), w, mapTop, mapBottom), type, buff)
         }
         return rooms to free
+    }
+
+    /** Une étiquette de salle : guilde, record, bouclier, voleur, type et bonus. */
+    private suspend fun readRoom(
+        screen: Screen, lab: Label, lines: List<OcrLine>, suffixes: List<String?>, d: (Int) -> Int, w: Int, mapTop: Int, mapBottom: Int,
+    ): RoomRead {
+        // Nom de la guilde : juste au-dessus de la ligne DMG.
+        val nameLine = lines.filter { it.bottom in (lab.top - d(40))..(lab.top + d(4)) && it.right > lab.left && it.left < lab.left + d(120) }
+        val guild = suffixes.indices.firstOrNull { i ->
+            val sfx = suffixes[i] ?: return@firstOrNull false
+            nameLine.any { n -> key(n.text).let { t -> t.contains(sfx) || (t.length >= sfx.length && levenshtein(t.takeLast(sfx.length), sfx) <= 1) } }
+        }
+        val dmg = readDmg(screen, lab, d)
+        // Corps de la salle, d'après la position de l'étiquette.
+        val l = lab.left - d(75)
+        val r = lab.left + d(135)
+        val t = lab.top - d(35)
+        val b = lab.top + d(212)
+        val sides = listOf(
+            screen.pixels.fraction(l - d(50), t + d(60), l - d(5), b, ::cyan),
+            screen.pixels.fraction(r + d(5), t + d(60), r + d(50), b, ::cyan),
+        )
+        val shield = sides.average() >= 0.12
+        // Voleur : « Volé » et le montant volé, au coin bas gauche de la salle. Sous une bulle de bouclier,
+        // seul le montant est lisible : un montant en K/M à cet endroit suffit.
+        val stolenVotes = Votes<String>()
+        lines.filter { kotlin.math.abs(it.left - l) < d(90) && kotlin.math.abs(it.top - b) < d(90) }.forEach { a ->
+            SOUL.find(a.text)?.let { m -> stolenVotes.add(m.groupValues[1].replace(',', '.') + m.groupValues[2]) }
+        }
+        val stolen = stolenVotes.best()
+        val cx = lab.left + d(30)
+        val cy = lab.top + d(90)
+        val type = floorType(screen, cx, lab.top + d(150), d(40))
+        // Bonus : badge « 50% » au bout de l'étiquette, juste sous elle. Lu comme texte, ou repéré à sa couleur
+        // vert d'eau quand le texte est mal lu (pas sous une bulle de bouclier, qui le teinte en cyan).
+        val buff = lines.any { BUFF.containsMatchIn(it.text) && it.left in lab.left + d(80)..lab.left + d(280) && it.top in lab.top - d(10)..lab.top + d(70) } ||
+            screen.pixels.fraction(cx + d(30), cy - d(68), cx + d(125), cy - d(12), ::mint) >= 0.04
+        return RoomRead(guild, dmg, shield, stolen, position(cx, cy, w, mapTop, mapBottom), cx, cy, type, buff)
     }
 
     // « 50% », parfois lu « 502 » ou « 505 ».
@@ -316,9 +324,9 @@ object MapReader {
 
     private suspend fun readDmg(screen: Screen, lab: Label, d: (Int) -> Int): String? {
         val variants = listOf(3 to Filter.COLOR, 3 to Filter.GRAY, 4 to Filter.COLOR, 2 to Filter.COLOR, 2 to Filter.GRAY, 5 to Filter.COLOR)
-        val texts = listOf(lab.text) + variants.flatMap { (scale, f) ->
-            screen.ocr(CropRequest(lab.left - d(10), lab.top - d(8), lab.left + d(190), lab.bottom + d(8), scale, f, Hint.DMG)).lines.map { it.text }
-        }
+        val texts = listOf(lab.text) + screen.ocrAll(
+            variants.map { (scale, f) -> CropRequest(lab.left - d(10), lab.top - d(8), lab.left + d(190), lab.bottom + d(8), scale, f, Hint.DMG) },
+        ).flatMap { p -> p.lines.map { it.text } }
         return parseDmg(texts)
     }
 
@@ -379,8 +387,8 @@ object MapReader {
             else -> return null
         }
         val votes = Votes<Pair<Int, Int>>()
-        for ((scale, f) in listOf(2 to Filter.GRAY, 3 to Filter.GRAY, 2 to Filter.COLOR, 3 to Filter.COLOR)) {
-            val p = screen.ocr(CropRequest(box[0], box[1], box[2], box[3], scale, f))
+        val reqs = listOf(2 to Filter.GRAY, 3 to Filter.GRAY, 2 to Filter.COLOR, 3 to Filter.COLOR).map { (scale, f) -> CropRequest(box[0], box[1], box[2], box[3], scale, f) }
+        for (p in screen.ocrAll(reqs)) {
             val t = parseTime(p.lines.joinToString(" ") { it.text })
             // « 42 min » seul peut être « 2 h 42 min » dont les heures sont mal lues : il compte moins.
             votes.add(t, if (t?.first == 0) 0.4 else 1.0)
@@ -425,8 +433,7 @@ object MapReader {
             centers.flatMap { cx ->
                 listOf(Filter.WHITE170, Filter.COLOR).map { f -> CropRequest((cx - half).toInt(), top, (cx + half).toInt(), bottom, 4, f, Hint.DIGITS) }
             }
-        for (req in crops) {
-            val p = screen.ocr(req)
+        for (p in screen.ocrAll(crops)) {
             for (e in p.elements) {
                 if (e.top < qTop + qh / 2 || !e.text.trim().all { it.isDigit() }) continue
                 val k = centers.indices.minBy { kotlin.math.abs(centers[it] - e.cx) }
@@ -447,8 +454,8 @@ object MapReader {
         val t = anchors.minOf { it.top } - 10
         val r = anchors.maxOf { it.right } + 80
         val b = anchors.maxOf { it.bottom } + 10
-        for ((scale, f) in listOf(2 to Filter.COLOR, 2 to Filter.GRAY, 3 to Filter.COLOR, 3 to Filter.GRAY)) {
-            val p = screen.ocr(CropRequest(l, t, r, b, scale, f))
+        val reqs = listOf(2 to Filter.COLOR, 2 to Filter.GRAY, 3 to Filter.COLOR, 3 to Filter.GRAY).map { (scale, f) -> CropRequest(l, t, r, b, scale, f) }
+        for (p in screen.ocrAll(reqs)) {
             p.lines.forEach { line -> TODAY.find(line.text)?.let { votes.add(it.groupValues[1].toInt()) } }
         }
         return votes.best()

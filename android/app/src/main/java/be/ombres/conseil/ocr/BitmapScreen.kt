@@ -8,6 +8,8 @@ import android.graphics.Paint
 import android.graphics.Rect
 import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 
 /** [Screen] sur une vraie capture : découpe, agrandit et filtre la zone, puis la passe dans ML Kit. */
@@ -20,9 +22,10 @@ class BitmapScreen private constructor(private val bitmap: Bitmap, override val 
         override fun rgb(x: Int, y: Int) = px[y * width + x] and 0xFFFFFF
     }
 
-    override suspend fun ocr(req: CropRequest): OcrPage {
+    // Zones lues en parallèle, mais pas toutes à la fois : une zone agrandie pèse jusqu'à ~10 Mo.
+    override suspend fun ocr(req: CropRequest): OcrPage = limit.withPermit {
         val (out, clamped) = withContext(Dispatchers.Default) { prepare(req) }
-        return OcrEngine.recognize(out).fromCrop(clamped, page).also { out.recycle() }
+        OcrEngine.recognize(out).fromCrop(clamped, page).also { out.recycle() }
     }
 
     /** Découpe, agrandit et filtre la zone (hors du fil principal). */
@@ -54,6 +57,8 @@ class BitmapScreen private constructor(private val bitmap: Bitmap, override val 
     }
 
     companion object {
+        private val limit = Semaphore(4)
+
         suspend fun of(bitmap: Bitmap) = BitmapScreen(bitmap, OcrEngine.recognize(bitmap))
     }
 }

@@ -351,7 +351,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 188.5K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
@@ -717,7 +718,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 8.5K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 2 Sape d’âme, 4 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -2423,7 +2425,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 457.7K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 5 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -2652,7 +2655,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 424.6K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 5 Sape d’âme, 0 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -2954,7 +2958,8 @@
    "enR": 62,
    "steps": [],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 144.8K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 9 Sape d’âme, 3 Garde immaculée, 0 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -3019,28 +3024,21 @@
    "margin": -146040,
    "myR": 79,
    "enR": 0,
-   "steps": [
-    {
-     "t": "Retirer le bouclier de haut gauche, puis l’attaquer",
-     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
-     "c": "1 Sanctuaire sacré"
-    }
-   ],
+   "steps": [],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
     "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
    ],
    "keep": [
-    "Il vous restera : 2 Esprit malveillant, 1 Sape d’âme, 0 Garde immaculée, 1 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 2 Esprit malveillant, 1 Sape d’âme, 0 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "37 min",
    "title": "Très difficile",
    "lines": [
-    "Au rythme actuel, s43-Nexus finit devant avec 146.0K d’avance.",
-    "Même avec le plan, il manquerait environ 146.0K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
+    "Au rythme actuel, s43-Nexus finit devant avec 146.0K d’avance."
    ],
    "hint": "Estimation : une salle du rival vaut environ 0.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 06)\nTrès difficile : Au rythme actuel, s43-Nexus finit devant avec 146.0K d’avance. Même avec le plan, il manquerait environ 146.0K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Retirer le bouclier de haut gauche, puis l’attaquer (1 Sanctuaire sacré)\n• Il vous restera : 2 Esprit malveillant, 1 Sape d’âme, 0 Garde immaculée, 1 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 06)\nTrès difficile : Au rythme actuel, s43-Nexus finit devant avec 146.0K d’avance.\nAucune action possible avec les salles et cartes indiquées.\n• Il vous restera : 2 Esprit malveillant, 1 Sape d’âme, 0 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -3835,9 +3833,9 @@
      "c": "1 Esprit malveillant"
     },
     {
-     "t": "Vider bas et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
+     "t": "Retirer le bouclier de centre, puis l’attaquer",
+     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
+     "c": "1 Sanctuaire sacré"
     }
    ],
    "threats": [
@@ -3845,7 +3843,7 @@
     "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 10 Sape d’âme, 3 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 1 Esprit malveillant, 10 Sape d’âme, 3 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "2 h 05",
    "title": "Rattrapable",
@@ -3854,7 +3852,7 @@
     "Avec le plan : vous finissez devant avec environ 121.2K d’avance (45.0/s contre 15.0/s), et vous repassez devant dans 2 h 05."
    ],
    "hint": "Estimation : une salle du rival vaut environ 7.5/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 3 h 12)\nRattrapable : Au rythme actuel, s43-Nexus finit devant avec 224.4K d’avance. Avec le plan : vous finissez devant avec environ 121.2K d’avance (45.0/s contre 15.0/s), et vous repassez devant dans 2 h 05.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Vider centre et l’occuper tout de suite (1 Esprit malveillant)\n3. Vider bas et l’occuper tout de suite (1 Esprit malveillant)\n• Il vous restera : 0 Esprit malveillant, 10 Sape d’âme, 3 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 3 h 12)\nRattrapable : Au rythme actuel, s43-Nexus finit devant avec 224.4K d’avance. Avec le plan : vous finissez devant avec environ 121.2K d’avance (45.0/s contre 15.0/s), et vous repassez devant dans 2 h 05.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Vider centre et l’occuper tout de suite (1 Esprit malveillant)\n3. Retirer le bouclier de centre, puis l’attaquer (1 Sanctuaire sacré)\n• Il vous restera : 1 Esprit malveillant, 10 Sape d’âme, 3 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -4101,7 +4099,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 329.1K d’avance) : le plan vise surtout ?, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 8 Sape d’âme, 0 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -4593,7 +4592,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 98.4K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 2 Esprit malveillant, 2 Sape d’âme, 3 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -5299,7 +5299,8 @@
    "enR": 12,
    "steps": [],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 488.7K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 3 Sape d’âme, 5 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -6132,7 +6133,7 @@
    "T": 2280,
    "room": 7.333333333333333,
    "margin0": -8880,
-   "margin": 32920,
+   "margin": 41280,
    "myR": 7.333333333333333,
    "enR": 14.666666666666668,
    "steps": [
@@ -6142,9 +6143,14 @@
      "c": "1 Garde immaculée"
     },
     {
-     "t": "Vider haut gauche et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
+     "t": "Retirer le bouclier de salle 2, la vider et l’occuper",
+     "d": "Sanctuaire sacré pour faire tomber le bouclier, puis Esprit malveillant. Vos joueurs doivent être prêts à entrer aussitôt.",
+     "c": "1 Sanctuaire sacré + 1 Esprit malveillant"
+    },
+    {
+     "t": "Sape d’âme sur haut gauche",
+     "d": "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.",
+     "c": "1 Sape d’âme"
     },
     {
      "t": "Sape d’âme sur salle 3",
@@ -6157,16 +6163,16 @@
     "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 6 Sape d’âme, 0 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 5 Sape d’âme, 0 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": null,
    "title": "Rattrapable",
    "lines": [
     "Au rythme actuel, s18-Noxia finit devant avec 8.9K d’avance.",
-    "Avec le plan : vous finissez devant avec environ 32.9K d’avance (7.3/s contre 14.7/s)."
+    "Avec le plan : vous finissez devant avec environ 41.3K d’avance (7.3/s contre 14.7/s)."
    ],
    "hint": "Estimation : une salle du rival vaut environ 7.3/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 38)\nRattrapable : Au rythme actuel, s18-Noxia finit devant avec 8.9K d’avance. Avec le plan : vous finissez devant avec environ 32.9K d’avance (7.3/s contre 14.7/s).\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Vider haut gauche et l’occuper tout de suite (1 Esprit malveillant)\n3. Sape d’âme sur salle 3 (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 6 Sape d’âme, 0 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 38)\nRattrapable : Au rythme actuel, s18-Noxia finit devant avec 8.9K d’avance. Avec le plan : vous finissez devant avec environ 41.3K d’avance (7.3/s contre 14.7/s).\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Retirer le bouclier de salle 2, la vider et l’occuper (1 Sanctuaire sacré + 1 Esprit malveillant)\n3. Sape d’âme sur haut gauche (1 Sape d’âme)\n4. Sape d’âme sur salle 3 (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 5 Sape d’âme, 0 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -6802,7 +6808,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 328.3K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [],
    "overtake": "1 h 40",
@@ -8306,9 +8313,9 @@
      "c": "1 Sanctuaire sacré"
     },
     {
-     "t": "Vider salle 2 et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
+     "t": "Retirer le bouclier de bas, puis l’attaquer",
+     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
+     "c": "1 Sanctuaire sacré"
     }
    ],
    "threats": [
@@ -8322,7 +8329,7 @@
     "Avec le plan : vous finissez devant avec environ 59.3K d’avance (48.0/s contre 10.0/s)."
    ],
    "hint": "Estimation : une salle du rival vaut environ 10.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 26)\nRattrapable : Au rythme actuel, ? finit devant avec 12.5K d’avance. Avec le plan : vous finissez devant avec environ 59.3K d’avance (48.0/s contre 10.0/s).\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Occuper une salle libre\n3. Occuper une salle libre\n4. Retirer le bouclier de salle 1, puis l’attaquer (1 Sanctuaire sacré)\n5. Vider salle 2 et l’occuper tout de suite (1 Esprit malveillant)"
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 26)\nRattrapable : Au rythme actuel, ? finit devant avec 12.5K d’avance. Avec le plan : vous finissez devant avec environ 59.3K d’avance (48.0/s contre 10.0/s).\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Occuper une salle libre\n3. Occuper une salle libre\n4. Retirer le bouclier de salle 1, puis l’attaquer (1 Sanctuaire sacré)\n5. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)"
   }
  },
  {
@@ -8404,7 +8411,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 143.6K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
@@ -8842,7 +8850,8 @@
    "threats": [
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 62.7K d’avance) : le plan vise surtout ?, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 10 Sape d’âme, 5 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -8959,7 +8968,8 @@
    "steps": [],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 156.1K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [],
    "overtake": null,
@@ -9561,7 +9571,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 181.3K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 6 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -9710,7 +9721,8 @@
    ],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 169.6K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 1 Sape d’âme, 2 Garde immaculée, 1 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -10452,7 +10464,8 @@
    "enR": 29,
    "steps": [],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 101.0K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
@@ -10901,7 +10914,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 117.7K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
@@ -11003,11 +11017,6 @@
      "t": "Attaquer centre en combat",
      "d": "Salle battable sans bouclier : aucune carte nécessaire. Vous gagnez sa production et le rival la perd.",
      "c": ""
-    },
-    {
-     "t": "Retirer le bouclier de bas, puis l’attaquer",
-     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
-     "c": "1 Sanctuaire sacré"
     }
    ],
    "threats": [
@@ -11015,7 +11024,7 @@
     "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "9 h 32",
    "title": "Très difficile",
@@ -11024,7 +11033,7 @@
     "Même avec le plan, il manquerait environ 168.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 0.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 11)\nTrès difficile : Au rythme actuel, ? finit devant avec 168.2K d’avance. Même avec le plan, il manquerait environ 168.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Attaquer bas en combat\n3. Attaquer centre en combat\n4. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n• Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 11)\nTrès difficile : Au rythme actuel, ? finit devant avec 168.2K d’avance. Même avec le plan, il manquerait environ 168.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Attaquer bas en combat\n3. Attaquer centre en combat\n• Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -11107,7 +11116,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 29.2K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 8 Sape d’âme, 4 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -11244,7 +11254,7 @@
    "T": 1620,
    "room": 10,
    "margin0": -215560,
-   "margin": -137800,
+   "margin": -124840,
    "myR": 20,
    "enR": 0,
    "steps": [
@@ -11254,14 +11264,19 @@
      "c": "1 Garde immaculée"
     },
     {
-     "t": "Vider centre et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
-    },
-    {
      "t": "Retirer le bouclier de bas, puis l’attaquer",
      "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
      "c": "1 Sanctuaire sacré"
+    },
+    {
+     "t": "Retirer le bouclier de centre, la vider et l’occuper",
+     "d": "Sanctuaire sacré pour faire tomber le bouclier, puis Esprit malveillant. Vos joueurs doivent être prêts à entrer aussitôt.",
+     "c": "1 Sanctuaire sacré + 1 Esprit malveillant"
+    },
+    {
+     "t": "Sape d’âme sur centre",
+     "d": "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.",
+     "c": "1 Sape d’âme"
     },
     {
      "t": "Sape d’âme sur haut gauche",
@@ -11271,19 +11286,20 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 137.8K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 3 Sape d’âme, 2 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 2 Sape d’âme, 2 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "2 h 33",
    "title": "Très difficile",
    "lines": [
     "Au rythme actuel, ? finit devant avec 215.6K d’avance.",
-    "Même avec le plan, il manquerait environ 137.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
+    "Même avec le plan, il manquerait environ 124.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 10.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 27)\nTrès difficile : Au rythme actuel, ? finit devant avec 215.6K d’avance. Même avec le plan, il manquerait environ 137.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Vider centre et l’occuper tout de suite (1 Esprit malveillant)\n3. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n4. Sape d’âme sur haut gauche (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 3 Sape d’âme, 2 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 27)\nTrès difficile : Au rythme actuel, ? finit devant avec 215.6K d’avance. Même avec le plan, il manquerait environ 124.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n3. Retirer le bouclier de centre, la vider et l’occuper (1 Sanctuaire sacré + 1 Esprit malveillant)\n4. Sape d’âme sur centre (1 Sape d’âme)\n5. Sape d’âme sur haut gauche (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 2 Sape d’âme, 2 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -11346,7 +11362,8 @@
    ],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 315.2K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 8 Sape d’âme, 2 Garde immaculée, 1 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -11992,7 +12009,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 910.3K d’avance) : le plan vise surtout ?, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 4 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -12647,7 +12665,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 133.3K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 2 Esprit malveillant, 3 Sape d’âme, 2 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -13445,7 +13464,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 162.3K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 5 Sape d’âme, 1 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -13798,7 +13818,8 @@
    ],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 420.7K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 2 Esprit malveillant, 8 Sape d’âme, 2 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -14422,7 +14443,8 @@
    ],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 119.5K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 7 Sape d’âme, 1 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -14753,7 +14775,8 @@
    "steps": [],
    "threats": [
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 580.8K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 4 Garde immaculée, 0 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -15268,7 +15291,8 @@
    ],
    "threats": [
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 215.3K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 0 Sape d’âme, 1 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -15428,7 +15452,8 @@
    "steps": [],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 109.6K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 2 Esprit malveillant, 10 Sape d’âme, 6 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -15612,7 +15637,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 291.7K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 2 Sape d’âme, 5 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -16045,11 +16071,6 @@
      "t": "Occuper une salle libre",
      "d": "Production gratuite : +2.5/s pour vous.",
      "c": ""
-    },
-    {
-     "t": "Retirer le bouclier de centre, la vider et l’occuper",
-     "d": "Sanctuaire sacré pour faire tomber le bouclier, puis Esprit malveillant. Vos joueurs doivent être prêts à entrer aussitôt.",
-     "c": "1 Sanctuaire sacré + 1 Esprit malveillant"
     }
    ],
    "threats": [
@@ -16058,7 +16079,7 @@
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
-    "Il vous restera : 1 Esprit malveillant, 0 Sape d’âme, 2 Garde immaculée, 1 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 2 Esprit malveillant, 0 Sape d’âme, 2 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "7 h 49",
    "title": "Très difficile",
@@ -16067,7 +16088,7 @@
     "Même avec le plan, il manquerait environ 603.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 0.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 41)\nTrès difficile : Au rythme actuel, ? finit devant avec 622.3K d’avance. Même avec le plan, il manquerait environ 603.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Occuper une salle libre\n2. Occuper une salle libre\n3. Occuper une salle libre\n4. Retirer le bouclier de centre, la vider et l’occuper (1 Sanctuaire sacré + 1 Esprit malveillant)\n• 1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.\n• Il vous restera : 1 Esprit malveillant, 0 Sape d’âme, 2 Garde immaculée, 1 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 41)\nTrès difficile : Au rythme actuel, ? finit devant avec 622.3K d’avance. Même avec le plan, il manquerait environ 603.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Occuper une salle libre\n2. Occuper une salle libre\n3. Occuper une salle libre\n• 1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.\n• Il vous restera : 2 Esprit malveillant, 0 Sape d’âme, 2 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -16248,7 +16269,8 @@
    "steps": [],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 238.8K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 2 Sape d’âme, 2 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -16478,7 +16500,7 @@
    "T": 840,
    "room": 30,
    "margin0": -700000,
-   "margin": -543760,
+   "margin": -503440,
    "myR": 126,
    "enR": -60,
    "steps": [
@@ -16498,37 +16520,47 @@
      "c": ""
     },
     {
-     "t": "Vider centre et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
-    },
-    {
-     "t": "Vider salle 2 et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
-    },
-    {
      "t": "Retirer le bouclier de bas, puis l’attaquer",
      "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
      "c": "1 Sanctuaire sacré"
+    },
+    {
+     "t": "Retirer le bouclier de bas, la vider et l’occuper",
+     "d": "Sanctuaire sacré pour faire tomber le bouclier, puis Esprit malveillant. Vos joueurs doivent être prêts à entrer aussitôt.",
+     "c": "1 Sanctuaire sacré + 1 Esprit malveillant"
+    },
+    {
+     "t": "Retirer le bouclier de bas, la vider et l’occuper",
+     "d": "Sanctuaire sacré pour faire tomber le bouclier, puis Esprit malveillant. Vos joueurs doivent être prêts à entrer aussitôt.",
+     "c": "1 Sanctuaire sacré + 1 Esprit malveillant"
+    },
+    {
+     "t": "Sape d’âme sur centre",
+     "d": "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.",
+     "c": "1 Sape d’âme"
+    },
+    {
+     "t": "Sape d’âme sur salle 2",
+     "d": "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.",
+     "c": "1 Sape d’âme"
     }
    ],
    "threats": [
-    "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 52.7K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
-    "Il vous restera : 0 Esprit malveillant, 4 Sape d’âme, 5 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 2 Sape d’âme, 5 Garde immaculée, 0 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "1 h 03",
    "title": "Très difficile",
    "lines": [
     "Au rythme actuel, s43-Nexus finit devant avec 700.0K d’avance.",
-    "Même avec le plan, il manquerait environ 543.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
+    "Même avec le plan, il manquerait environ 503.4K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 30.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 14)\nTrès difficile : Au rythme actuel, s43-Nexus finit devant avec 700.0K d’avance. Même avec le plan, il manquerait environ 543.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Occuper une salle libre\n2. Occuper une salle libre\n3. Occuper une salle libre\n4. Vider centre et l’occuper tout de suite (1 Esprit malveillant)\n5. Vider salle 2 et l’occuper tout de suite (1 Esprit malveillant)\n6. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n• 1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.\n• Il vous restera : 0 Esprit malveillant, 4 Sape d’âme, 5 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 14)\nTrès difficile : Au rythme actuel, s43-Nexus finit devant avec 700.0K d’avance. Même avec le plan, il manquerait environ 503.4K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Occuper une salle libre\n2. Occuper une salle libre\n3. Occuper une salle libre\n4. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n5. Retirer le bouclier de bas, la vider et l’occuper (1 Sanctuaire sacré + 1 Esprit malveillant)\n6. Retirer le bouclier de bas, la vider et l’occuper (1 Sanctuaire sacré + 1 Esprit malveillant)\n7. Sape d’âme sur centre (1 Sape d’âme)\n8. Sape d’âme sur salle 2 (1 Sape d’âme)\n• 1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.\n• Il vous restera : 0 Esprit malveillant, 2 Sape d’âme, 5 Garde immaculée, 0 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -16594,9 +16626,9 @@
      "c": "1 Garde immaculée"
     },
     {
-     "t": "Vider bas et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
+     "t": "Retirer le bouclier de centre, puis l’attaquer",
+     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
+     "c": "1 Sanctuaire sacré"
     }
    ],
    "threats": [
@@ -16604,7 +16636,7 @@
     "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
    ],
    "keep": [
-    "Il vous restera : 1 Esprit malveillant, 7 Sape d’âme, 1 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 2 Esprit malveillant, 7 Sape d’âme, 1 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": null,
    "title": "Rattrapable",
@@ -16613,7 +16645,7 @@
     "Avec le plan : vous finissez devant avec environ 632.3K d’avance (37.0/s contre 15.0/s)."
    ],
    "hint": "Estimation : une salle du rival vaut environ 15.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 7 h 59)\nRattrapable : Au rythme actuel, s18-Noxia finit devant avec 229.9K d’avance. Avec le plan : vous finissez devant avec environ 632.3K d’avance (37.0/s contre 15.0/s).\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Vider bas et l’occuper tout de suite (1 Esprit malveillant)\n• Il vous restera : 1 Esprit malveillant, 7 Sape d’âme, 1 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 7 h 59)\nRattrapable : Au rythme actuel, s18-Noxia finit devant avec 229.9K d’avance. Avec le plan : vous finissez devant avec environ 632.3K d’avance (37.0/s contre 15.0/s).\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Retirer le bouclier de centre, puis l’attaquer (1 Sanctuaire sacré)\n• Il vous restera : 2 Esprit malveillant, 7 Sape d’âme, 1 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -17869,7 +17901,8 @@
    ],
    "threats": [
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 19.8K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [],
    "overtake": "24 h 51",
@@ -18870,7 +18903,8 @@
    "threats": [
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 188.2K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [],
    "overtake": null,
@@ -20616,19 +20650,15 @@
      "t": "Attaquer haut gauche en combat",
      "d": "Salle battable sans bouclier : aucune carte nécessaire. Vous gagnez sa production et le rival la perd.",
      "c": ""
-    },
-    {
-     "t": "Sape d’âme sur centre",
-     "d": "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.",
-     "c": "1 Sape d’âme"
     }
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 454.1K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 5 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 1 Sape d’âme, 5 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "10 h 07",
    "title": "Très difficile",
@@ -20637,7 +20667,7 @@
     "Même avec le plan, il manquerait environ 939.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 0.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 1 h 25)\nTrès difficile : Au rythme actuel, s18-Noxia finit devant avec 939.2K d’avance. Même avec le plan, il manquerait environ 939.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Attaquer salle 2 en combat\n3. Attaquer haut gauche en combat\n4. Sape d’âme sur centre (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 5 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 1 h 25)\nTrès difficile : Au rythme actuel, s18-Noxia finit devant avec 939.2K d’avance. Même avec le plan, il manquerait environ 939.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Attaquer salle 2 en combat\n3. Attaquer haut gauche en combat\n• Il vous restera : 0 Esprit malveillant, 1 Sape d’âme, 5 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -21221,7 +21251,7 @@
    "T": 7200,
    "room": 21,
    "margin0": -937600,
-   "margin": 272000,
+   "margin": 347600,
    "myR": 114,
    "enR": -21,
    "steps": [
@@ -21241,9 +21271,14 @@
      "c": ""
     },
     {
-     "t": "Vider bas et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
+     "t": "Retirer le bouclier de bas, puis l’attaquer",
+     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
+     "c": "1 Sanctuaire sacré"
+    },
+    {
+     "t": "Sape d’âme sur bas",
+     "d": "C’est la finale : les cartes non jouées seront perdues, autant les utiliser.",
+     "c": "1 Sape d’âme"
     }
    ],
    "threats": [
@@ -21256,10 +21291,10 @@
    "title": "Rattrapable",
    "lines": [
     "Au rythme actuel, s43-Nexus finit devant avec 937.6K d’avance.",
-    "Avec le plan : vous finissez devant avec environ 272.0K d’avance (114.0/s contre -21.0/s), et vous repassez devant dans 1 h 26."
+    "Avec le plan : vous finissez devant avec environ 347.6K d’avance (114.0/s contre -21.0/s), et vous repassez devant dans 1 h 26."
    ],
    "hint": "Estimation : une salle du rival vaut environ 21.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 2 h 00)\nRattrapable : Au rythme actuel, s43-Nexus finit devant avec 937.6K d’avance. Avec le plan : vous finissez devant avec environ 272.0K d’avance (114.0/s contre -21.0/s), et vous repassez devant dans 1 h 26.\nPlan :\n1. Attaquer haut gauche en combat\n2. Attaquer haut gauche en combat\n3. Attaquer haut gauche en combat\n4. Vider bas et l’occuper tout de suite (1 Esprit malveillant)"
+   "text": "Conseil de guerre — Zone sombre (fin dans 2 h 00)\nRattrapable : Au rythme actuel, s43-Nexus finit devant avec 937.6K d’avance. Avec le plan : vous finissez devant avec environ 347.6K d’avance (114.0/s contre -21.0/s), et vous repassez devant dans 1 h 26.\nPlan :\n1. Attaquer haut gauche en combat\n2. Attaquer haut gauche en combat\n3. Attaquer haut gauche en combat\n4. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n5. Sape d’âme sur bas (1 Sape d’âme)"
   }
  },
  {
@@ -21764,7 +21799,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 249.5K d’avance) : le plan vise surtout ?, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [],
    "overtake": null,
@@ -22137,29 +22173,15 @@
      "t": "Mettre un bouclier sur notre salle principale",
      "d": "Sans bouclier, le rival peut la vider avec un Esprit malveillant ou y placer un voleur. C’est votre source de production : à protéger avant tout.",
      "c": "1 Garde immaculée"
-    },
-    {
-     "t": "Retirer le bouclier de haut gauche, puis l’attaquer",
-     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
-     "c": "1 Sanctuaire sacré"
-    },
-    {
-     "t": "Retirer le bouclier de centre, puis l’attaquer",
-     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
-     "c": "1 Sanctuaire sacré"
-    },
-    {
-     "t": "Sape d’âme sur haut gauche",
-     "d": "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.",
-     "c": "1 Sape d’âme"
     }
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 508.5K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 1 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 1 Sape d’âme, 1 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "6 h 13",
    "title": "Très difficile",
@@ -22168,7 +22190,7 @@
     "Même avec le plan, il manquerait environ 651.4K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 0.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 11)\nTrès difficile : Au rythme actuel, s43-Nexus finit devant avec 651.4K d’avance. Même avec le plan, il manquerait environ 651.4K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Retirer le bouclier de haut gauche, puis l’attaquer (1 Sanctuaire sacré)\n3. Retirer le bouclier de centre, puis l’attaquer (1 Sanctuaire sacré)\n4. Sape d’âme sur haut gauche (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 1 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 11)\nTrès difficile : Au rythme actuel, s43-Nexus finit devant avec 651.4K d’avance. Même avec le plan, il manquerait environ 651.4K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n• Il vous restera : 0 Esprit malveillant, 1 Sape d’âme, 1 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -22312,7 +22334,8 @@
    "steps": [],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 165.1K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 2 Esprit malveillant, 0 Sape d’âme, 0 Garde immaculée, 0 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -23056,7 +23079,8 @@
    "threats": [
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 565.4K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
@@ -23131,7 +23155,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 27.9K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt."
@@ -23284,7 +23309,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 170.9K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 4 Sape d’âme, 3 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -23726,7 +23752,8 @@
    "threats": [
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 62.7K d’avance) : le plan vise surtout ?, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 10 Sape d’âme, 5 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -23843,7 +23870,8 @@
    "steps": [],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 156.1K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [],
    "overtake": null,
@@ -24445,7 +24473,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 181.3K d’avance) : le plan vise surtout s43-Nexus, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 6 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -25347,7 +25376,8 @@
    "enR": 29,
    "steps": [],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 101.0K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
@@ -25817,7 +25847,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 117.7K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "1 Garde immaculée en réserve aujourd’hui : si le rival fait tomber votre bouclier, remettez-le aussitôt.",
@@ -25919,11 +25950,6 @@
      "t": "Attaquer centre en combat",
      "d": "Salle battable sans bouclier : aucune carte nécessaire. Vous gagnez sa production et le rival la perd.",
      "c": ""
-    },
-    {
-     "t": "Retirer le bouclier de bas, puis l’attaquer",
-     "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
-     "c": "1 Sanctuaire sacré"
     }
    ],
    "threats": [
@@ -25931,7 +25957,7 @@
     "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "9 h 32",
    "title": "Très difficile",
@@ -25940,7 +25966,7 @@
     "Même avec le plan, il manquerait environ 168.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 0.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 11)\nTrès difficile : Au rythme actuel, ? finit devant avec 168.2K d’avance. Même avec le plan, il manquerait environ 168.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Attaquer bas en combat\n3. Attaquer centre en combat\n4. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n• Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 3 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 11)\nTrès difficile : Au rythme actuel, ? finit devant avec 168.2K d’avance. Même avec le plan, il manquerait environ 168.2K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Attaquer bas en combat\n3. Attaquer centre en combat\n• Il vous restera : 0 Esprit malveillant, 7 Sape d’âme, 5 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -26023,7 +26049,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 29.2K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 8 Sape d’âme, 4 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -26160,7 +26187,7 @@
    "T": 1620,
    "room": 10,
    "margin0": -215560,
-   "margin": -137800,
+   "margin": -124840,
    "myR": 20,
    "enR": 0,
    "steps": [
@@ -26170,14 +26197,19 @@
      "c": "1 Garde immaculée"
     },
     {
-     "t": "Vider centre et l’occuper tout de suite",
-     "d": "Trop solide pour un combat : l’Esprit malveillant la vide. Prévenez vos joueurs avant, pour qu’ils l’occupent avant le rival.",
-     "c": "1 Esprit malveillant"
-    },
-    {
      "t": "Retirer le bouclier de bas, puis l’attaquer",
      "d": "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.",
      "c": "1 Sanctuaire sacré"
+    },
+    {
+     "t": "Retirer le bouclier de centre, la vider et l’occuper",
+     "d": "Sanctuaire sacré pour faire tomber le bouclier, puis Esprit malveillant. Vos joueurs doivent être prêts à entrer aussitôt.",
+     "c": "1 Sanctuaire sacré + 1 Esprit malveillant"
+    },
+    {
+     "t": "Sape d’âme sur centre",
+     "d": "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.",
+     "c": "1 Sape d’âme"
     },
     {
      "t": "Sape d’âme sur haut gauche",
@@ -26187,19 +26219,20 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 137.8K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
-    "Il vous restera : 0 Esprit malveillant, 3 Sape d’âme, 2 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+    "Il vous restera : 0 Esprit malveillant, 2 Sape d’âme, 2 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
    ],
    "overtake": "2 h 33",
    "title": "Très difficile",
    "lines": [
     "Au rythme actuel, ? finit devant avec 215.6K d’avance.",
-    "Même avec le plan, il manquerait environ 137.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
+    "Même avec le plan, il manquerait environ 124.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables."
    ],
    "hint": "Estimation : une salle du rival vaut environ 10.0/s.",
-   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 27)\nTrès difficile : Au rythme actuel, ? finit devant avec 215.6K d’avance. Même avec le plan, il manquerait environ 137.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Vider centre et l’occuper tout de suite (1 Esprit malveillant)\n3. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n4. Sape d’âme sur haut gauche (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 3 Sape d’âme, 2 Garde immaculée, 5 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
+   "text": "Conseil de guerre — Zone sombre (fin dans 0 h 27)\nTrès difficile : Au rythme actuel, ? finit devant avec 215.6K d’avance. Même avec le plan, il manquerait environ 124.8K. Il faut prendre plus de salles que prévu ou trouver d’autres cibles battables.\nPlan :\n1. Mettre un bouclier sur notre salle principale (1 Garde immaculée)\n2. Retirer le bouclier de bas, puis l’attaquer (1 Sanctuaire sacré)\n3. Retirer le bouclier de centre, la vider et l’occuper (1 Sanctuaire sacré + 1 Esprit malveillant)\n4. Sape d’âme sur centre (1 Sape d’âme)\n5. Sape d’âme sur haut gauche (1 Sape d’âme)\n• Il vous restera : 0 Esprit malveillant, 2 Sape d’âme, 2 Garde immaculée, 4 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
   }
  },
  {
@@ -26262,7 +26295,8 @@
    ],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s18-Noxia finirait aussi devant vous (environ 315.2K d’avance) : le plan vise surtout ?, prendre des salles à s18-Noxia compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 8 Sape d’âme, 2 Garde immaculée, 1 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -26583,7 +26617,8 @@
     "Ajoute les salles du rival pour obtenir un plan d’attaque précis.",
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 93.0K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [],
    "overtake": null,
@@ -26944,7 +26979,8 @@
    ],
    "threats": [
     "Si votre production baisse sans raison, le rival a peut-être posé un voleur : un Sanctuaire sacré sur votre salle l’élimine.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s40-Ombres finirait aussi devant vous (environ 910.3K d’avance) : le plan vise surtout ?, prendre des salles à s40-Ombres compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 4 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -27981,7 +28017,8 @@
    ],
    "threats": [
     "Votre salle principale n’a pas de bouclier et vous ne pouvez pas en remettre aujourd’hui : gardez des joueurs prêts à la reprendre si elle est vidée.",
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "s43-Nexus finirait aussi devant vous (environ 490.2K d’avance) : le plan vise surtout s40-Ombres, prendre des salles à s43-Nexus compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 0 Esprit malveillant, 0 Sape d’âme, 1 Garde immaculée, 6 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."
@@ -28344,7 +28381,8 @@
     }
    ],
    "threats": [
-    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts."
+    "Avec ses propres cartes, le rival peut faire tomber votre bouclier puis vider votre salle. Surveillez la carte et gardez des joueurs prêts.",
+    "? finirait aussi devant vous (environ 162.3K d’avance) : le plan vise surtout s18-Noxia, prendre des salles à ? compterait double contre elle."
    ],
    "keep": [
     "Il vous restera : 1 Esprit malveillant, 5 Sape d’âme, 1 Garde immaculée, 2 Sanctuaire sacré. Ces cartes ne se renouvellent pas pendant la phase éliminatoire."

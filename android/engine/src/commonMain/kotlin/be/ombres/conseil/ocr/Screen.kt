@@ -1,5 +1,9 @@
 package be.ombres.conseil.ocr
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
 /** Traitement appliqué à une zone avant la lecture. */
 enum class Filter {
     COLOR,
@@ -54,6 +58,9 @@ interface Screen {
     val pixels: Pixels
     suspend fun ocr(req: CropRequest): OcrPage
 }
+
+/** Lit toutes les zones en parallèle (résultats dans l'ordre de [reqs]) ; l'écran limite lui-même le nombre de lectures simultanées. */
+suspend fun Screen.ocrAll(reqs: List<CropRequest>): List<OcrPage> = coroutineScope { reqs.map { async { ocr(it) } }.awaitAll() }
 
 /** Ramène une page lue sur une zone agrandie en coordonnées de la capture. */
 fun OcrPage.fromCrop(req: CropRequest, full: OcrPage): OcrPage {

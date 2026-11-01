@@ -32,11 +32,12 @@ class RecordingScreen(private val inner: Screen) : Screen {
     override val pixels get() = inner.pixels
     private val crops = LinkedHashMap<String, OcrPage>()
 
-    override suspend fun ocr(req: CropRequest): OcrPage = inner.ocr(req).also { crops[req.key] = it }
+    // Zones lues en parallèle : accès protégés.
+    override suspend fun ocr(req: CropRequest): OcrPage = inner.ocr(req).also { synchronized(crops) { crops[req.key] = it } }
 
     fun toJson(): JSONObject = JSONObject()
         .put("page", page.toJson())
-        .put("crops", JSONObject().apply { crops.forEach { (k, v) -> put(k, v.toJson()) } })
+        .put("crops", JSONObject().apply { synchronized(crops) { crops.forEach { (k, v) -> put(k, v.toJson()) } } })
 }
 
 /** Rejoue un enregistrement de [RecordingScreen] ; les pixels viennent de la capture d'origine. */
