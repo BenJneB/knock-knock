@@ -1,7 +1,7 @@
 # Contrôles de sécurité (gratuits sur un dépôt public) :
 # - CodeQL : analyse du code Kotlin (appli, moteur) et du JavaScript des pages web ;
-# - OSV-Scanner : dépendances JavaScript (outils de compilation du moteur web) ayant une faille connue ;
-# - Dependency review : nouvelles dépendances vulnérables introduites par une pull request.
+# - OSV-Scanner : dépendances JavaScript (outils de compilation du moteur web) ayant une faille connue.
+# Les dépendances Gradle sont suivies par Dependabot (.github/dependabot.yml).
 # Les résultats apparaissent dans l'onglet Security du dépôt.
 name: Sécurité
 
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   codeql:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # fixé : un changement d'image ne doit pas casser la CI sans prévenir
     timeout-minutes: 40
     permissions:
       security-events: write
@@ -70,14 +70,3 @@ jobs:
     with:
       scan-args: |-
         --lockfile=android/kotlin-js-store/yarn.lock
-
-  revue-dependances:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/dependency-review-action@v5
-        with:
-          fail-on-severity: high
