@@ -37,6 +37,7 @@ import be.ombres.conseil.mode.GameMode
 import be.ombres.conseil.mode.GuildsSection
 import be.ombres.conseil.mode.ReadReport
 import be.ombres.conseil.mode.ReadReportSection
+import be.ombres.conseil.mode.RoomKind
 import be.ombres.conseil.mode.copyPlan
 import be.ombres.conseil.ocr.Screen
 import be.ombres.conseil.ui.Art
@@ -177,6 +178,7 @@ object ZoneSombreMode : GameMode {
                     Labeled("Bouclier", R.drawable.ic_shield_bubble) { Choice(listOf(false to "Non", true to "Oui"), r.sh) { set(r.copy(sh = it)) } }
                     Labeled("Battable") { Choice(listOf(true to "Oui", false to "Non"), r.b) { set(r.copy(b = it)) } }
                 }
+                RoomKind(r.type, r.buff) { t, b -> set(r.copy(type = t, buff = b)) }
             }
             OutlinedButton(onClick = { upd { it.copy(rooms = it.rooms + RoomIn()) } }) { Text("Ajouter une salle") }
         }

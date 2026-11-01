@@ -15,11 +15,7 @@ function drawRoomList(id, list, free){
   if (!list.length) box.append(el("p", "hint", "Aucune salle."));
   list.forEach((r, i) => {
     const d = el("div", "room");
-    // Type (lits et production d'un joueur) et bonus « 50% » : donnent la production de la salle.
-    const kind = `
-         <div><label>Type</label><select data-k="type"><option value="">?</option><option value="BASIC">basique</option>
-           <option value="INTERMEDIATE">intermédiaire</option><option value="SUPREME">suprême</option></select></div>
-         <div><label>Bonus 50%</label><select data-k="buff"><option value="">Non</option><option value="1">Oui</option></select></div>`;
+    const kind = roomKindHtml();
     d.innerHTML = free
       ? `<div><label>Salle</label><input type="text" placeholder="haut gauche" data-k="n"></div>
          <div><label>Guilde (vide = libre)</label><input type="text" placeholder="Noxia" data-k="owner"></div>

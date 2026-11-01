@@ -1,6 +1,7 @@
 package be.ombres.conseil.mode.zonesombre
 
 import be.ombres.conseil.game.GuildIn
+import be.ombres.conseil.game.RoomType
 import be.ombres.conseil.game.Step
 import be.ombres.conseil.game.dur
 import be.ombres.conseil.game.fixed
@@ -19,7 +20,8 @@ import kotlin.math.min
  * Les champs restent des chaînes, telles que saisies, pour que les deux interfaces se comportent pareil.
  */
 
-data class RoomIn(val n: String = "", val sh: Boolean = false, val b: Boolean = true)
+/** Salle du rival : nom, bouclier, battable ; [type] (nom d'un [RoomType], vide si inconnu) et [buff] « 50% » donnent sa production. */
+data class RoomIn(val n: String = "", val sh: Boolean = false, val b: Boolean = true, val type: String = "", val buff: Boolean = false)
 
 data class PlanInput(
     val guilds: List<GuildIn> = listOf(GuildIn(n = "s40-Ombres"), GuildIn(), GuildIn()),
@@ -62,7 +64,8 @@ data class PlanOk(
 
 /* ---------- moteur de stratégie ---------- */
 
-private class Room(val i: Int, val n: String, val sh: Boolean, val b: Boolean, var used: Boolean = false)
+/** [value] : production de la salle (/s), d'après son type et son bonus ; sinon moyenne des salles du rival. */
+private class Room(val i: Int, val n: String, val sh: Boolean, val b: Boolean, val value: Double, var used: Boolean = false)
 
 private class Candidate(val r: Room?, val cost: LinkedHashMap<String, Int>, val gain: Double, val kind: String)
 
@@ -108,9 +111,11 @@ fun plan(st: PlanInput): PlanResult {
     } else if (stock["gi"]!! > 0 && budget > 1) { reserveGI = true; budget-- }
 
     // 2. Candidats offensifs
-    val rooms = st.rooms.mapIndexed { i, r -> Room(i, r.n.ifEmpty { "salle ${i + 1}" }, r.sh, r.b) }
-    val take = 2 * room * T
-    val sapeGain = 2 * p * room * min(7200, T)
+    val rooms = st.rooms.mapIndexed { i, r -> Room(i, r.n.ifEmpty { "salle ${i + 1}" }, r.sh, r.b, RoomType.of(r.type)?.full(r.buff) ?: room) }
+
+    // Prendre une salle : sa production passe du rival à nous (compte double) ; Sape : une part pendant 2 h.
+    fun take(r: Room) = 2 * r.value * T
+    fun sapeGain(r: Room) = 2 * p * r.value * min(7200, T)
     fun need() = (if (finale) safety * 2 else safety) - margin
     var freeLeft = int(st.free)
 
@@ -118,11 +123,11 @@ fun plan(st: PlanInput): PlanResult {
     fun candidates(): List<Candidate> {
         val c = mutableListOf<Candidate>()
         rooms.filter { !it.used }.forEach { r ->
-            if (r.b && !r.sh) c.add(Candidate(r, cost(), take, "combat"))
-            if (r.b && r.sh) c.add(Candidate(r, cost("ss" to 1), take, "ss-combat"))
-            if (!r.b && !r.sh) c.add(Candidate(r, cost("em" to 1), take, "em"))
-            if (!r.b && r.sh) c.add(Candidate(r, cost("ss" to 1, "em" to 1), take, "ss-em"))
-            if (!r.sh) c.add(Candidate(r, cost("sa" to 1), sapeGain, "sape"))
+            if (r.b && !r.sh) c.add(Candidate(r, cost(), take(r), "combat"))
+            if (r.b && r.sh) c.add(Candidate(r, cost("ss" to 1), take(r), "ss-combat"))
+            if (!r.b && !r.sh) c.add(Candidate(r, cost("em" to 1), take(r), "em"))
+            if (!r.b && r.sh) c.add(Candidate(r, cost("ss" to 1, "em" to 1), take(r), "ss-em"))
+            if (!r.sh) c.add(Candidate(r, cost("sa" to 1), sapeGain(r), "sape"))
         }
         if (freeLeft > 0) c.add(Candidate(null, cost(), freeV * T, "free"))
         return c.filter { x -> x.cost.all { (k, v) -> stock[k]!! >= v } && x.cost.values.sum() <= budget }
@@ -140,7 +145,7 @@ fun plan(st: PlanInput): PlanResult {
         if (c.kind == "free") { freeLeft--; myR += freeV; steps.add(Step("Occuper une salle libre", "Production gratuite : +${jsNum(freeV)}/s pour vous.", "")); continue }
         val n = c.r!!.n
         if (c.kind == "sape") { steps.add(Step("Sape d’âme sur $n", "Le voleur prend une partie de leur production pendant 2 h, que vous récupérez.", "1 Sape d’âme")); continue }
-        myR += room; enR -= room
+        myR += c.r.value; enR -= c.r.value
         when (c.kind) {
             "combat" -> steps.add(Step("Attaquer $n en combat", "Salle battable sans bouclier : aucune carte nécessaire. Vous gagnez sa production et le rival la perd.", ""))
             "ss-combat" -> steps.add(Step("Retirer le bouclier de $n, puis l’attaquer", "Le Sanctuaire sacré supprime leur bouclier, vos joueurs prennent ensuite la salle en combat.", "1 Sanctuaire sacré"))
@@ -152,7 +157,7 @@ fun plan(st: PlanInput): PlanResult {
     // 3. En finale, les cartes restantes ne servent plus à rien : on vide les Sapes
     if (finale) {
         rooms.filter { !it.used && !it.sh }.forEach { r ->
-            if (stock["sa"]!! > 0 && budget > 0) { use("sa"); r.used = true; margin += sapeGain; steps.add(Step("Sape d’âme sur ${r.n}", "C’est la finale : les cartes non jouées seront perdues, autant les utiliser.", "1 Sape d’âme")) }
+            if (stock["sa"]!! > 0 && budget > 0) { use("sa"); r.used = true; margin += sapeGain(r); steps.add(Step("Sape d’âme sur ${r.n}", "C’est la finale : les cartes non jouées seront perdues, autant les utiliser.", "1 Sape d’âme")) }
         }
     }
 

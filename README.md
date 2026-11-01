@@ -99,7 +99,8 @@ android/engine/src/commonMain/kotlin/be/ombres/conseil/
                           « 50% »), report du bandeau, production mesurée — communs aux modes
   mode/capitale/          DcPlan (stratégie), DcMerge (report d'une lecture)
   mode/zonesombre/
-    ZsPlan.kt             moteur de stratégie (plan), verdict, texte à partager
+    ZsPlan.kt             moteur de stratégie (plan), verdict, texte à partager ; valeur d'une salle d'après
+                          son type et son bonus quand ils sont connus, sinon moyenne des salles du rival
     ZsMerge.kt            report d'une lecture dans les valeurs mémorisées
     ZsHistory.kt          mesure de la part volée par un voleur entre deux captures
 ```

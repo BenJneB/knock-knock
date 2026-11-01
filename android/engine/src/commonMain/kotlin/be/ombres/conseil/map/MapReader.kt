@@ -202,6 +202,9 @@ object MapReader {
     private val DMG = Regex("dm[g6]\\s*([\\x3A.;&,]?)\\s*([0-9OSA]+(?:[.,][0-9OSA]+)?)\\s*([KMB])?", RegexOption.IGNORE_CASE)
     private val FREE_RATE = Regex("(\\d+(?:[.,]\\d+)?)\\s*/\\s*[s5]")
 
+    /** Vert d'eau du badge « 50% » (plus vert que bleu, contrairement à la bulle de bouclier). */
+    private fun mint(r: Int, g: Int, b: Int) = g > 140 && g > r + 60 && g > b + 8 && b > r + 20
+
     /** Bleu clair de la bulle de bouclier (le sol de la carte est violet : g < r). */
     private fun cyan(r: Int, g: Int, b: Int) = g > r + 30 && b > r + 50 && b >= g - 15
 
@@ -257,8 +260,10 @@ object MapReader {
             val cx = lab.left + d(30)
             val cy = lab.top + d(90)
             val type = floorType(screen, cx, lab.top + d(150), d(40))
-            // Bonus : badge « 50% » au bout de l'étiquette, juste sous elle.
-            val buff = lines.any { BUFF.containsMatchIn(it.text) && it.left in lab.left + d(80)..lab.left + d(280) && it.top in lab.top - d(10)..lab.top + d(70) }
+            // Bonus : badge « 50% » au bout de l'étiquette, juste sous elle. Lu comme texte, ou repéré à sa couleur
+            // vert d'eau quand le texte est mal lu (pas sous une bulle de bouclier, qui le teinte en cyan).
+            val buff = lines.any { BUFF.containsMatchIn(it.text) && it.left in lab.left + d(80)..lab.left + d(280) && it.top in lab.top - d(10)..lab.top + d(70) } ||
+                screen.pixels.fraction(cx + d(30), cy - d(68), cx + d(125), cy - d(12), ::mint) >= 0.04
             RoomRead(guild, dmg, shield, stolen, position(cx, cy, w, mapTop, mapBottom), cx, cy, type, buff)
         }
 

@@ -160,6 +160,14 @@ class MapReaderTest {
         val r = read("situation2")
         assertEquals(listOf(RoomType.BASIC, RoomType.INTERMEDIATE), r.rooms.filter { it.guild == 0 }.map { it.type }.sortedBy { it!!.ordinal })
         assertEquals(RoomType.SUPREME, r.rooms.single { it.dmg == "2.91B" }.type)
+        assertEquals(true, r.rooms.single { it.dmg == "3.02B" }.buff) // badge repéré à sa couleur (texte illisible)
+    }
+
+    /** Bonus « 50% » : lus comme texte ou repérés à leur couleur ; ceux sous une bulle de bouclier restent manqués. */
+    @Test
+    fun buffBadges() {
+        val r = read("situation3")
+        assertEquals(listOf("355.18M", "57.45B", "863.28M"), r.rooms.filter { it.buff }.map { it.dmg }.sortedBy { it })
     }
 
     @Test

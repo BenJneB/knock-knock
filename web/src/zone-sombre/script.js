@@ -17,13 +17,13 @@ function drawRooms(){
       <div><label>Salle</label><input type="text" placeholder="haut gauche" data-k="n"></div>
       <div><label>Bouclier</label><select data-k="sh"><option value="0">Non</option><option value="1">Oui</option></select></div>
       <div><label>Battable</label><select data-k="b"><option value="1">Oui</option><option value="0">Non</option></select></div>
-      <button class="x" type="button" aria-label="Retirer la salle">×</button>`;
+      <button class="x" type="button" aria-label="Retirer la salle">×</button>${roomKindHtml()}`;
     d.querySelectorAll("[data-k]").forEach(inp => { inp.value = r[inp.dataset.k] ?? ""; inp.oninput = inp.onchange = () => { r[inp.dataset.k] = inp.value; save(); }; });
     d.querySelector(".x").onclick = () => { st.rooms.splice(i, 1); save(); drawRooms(); };
     box.append(d);
   });
 }
-$("#addRoom").onclick = () => { st.rooms.push({ n:"", sh:"0", b:"1" }); save(); drawRooms(); };
+$("#addRoom").onclick = () => { st.rooms.push({ n:"", sh:"0", b:"1", type:"", buff:"" }); save(); drawRooms(); };
 
 /* ---------- simple fields ---------- */
 const FIELDS = ["th","tm","round","em","sa","gi","ss","today","shield","free","freeV","sapeP"];

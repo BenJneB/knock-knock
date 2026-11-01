@@ -86,6 +86,23 @@ class CrossPlatformTest {
         )
     }
 
+    /** Zone sombre : la valeur d'une salle suit son type et son bonus (salle suprême = 4 lits × 8/s = 32/s). */
+    @Test
+    fun zoneSombreRoomValues() {
+        val st = PlanInput(
+            guilds = listOf(GuildIn("s18-Noxia", "900K", "40", "2"), GuildIn("s40-Ombres", "800K", "30", "2"), GuildIn("s43-Nexus", "500K", "20", "2")),
+            me = 1, th = "2", tm = "0",
+            rooms = listOf(
+                RoomIn("basique", sh = false, b = true, type = "BASIC"),
+                RoomIn("suprême", sh = false, b = true, type = "SUPREME"),
+            ),
+        )
+        val r = plan(st) as PlanOk
+        assertEquals("Attaquer suprême en combat", r.steps.first().t)
+        assertEquals(30.0 + 32.0, r.myR) // notre production gagne celle de la salle suprême
+        assertEquals(40.0 - 32.0, r.enR)
+    }
+
     @Test
     fun capitalePlan() {
         val st = DcInput(

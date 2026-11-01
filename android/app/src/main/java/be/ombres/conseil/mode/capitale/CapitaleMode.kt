@@ -21,17 +21,16 @@ import androidx.compose.ui.unit.dp
 import be.ombres.conseil.R
 import be.ombres.conseil.core.Prefs
 import be.ombres.conseil.core.SoulHistory
-import be.ombres.conseil.game.RoomType
 import be.ombres.conseil.map.MapReader
 import be.ombres.conseil.mode.Brief
 import be.ombres.conseil.mode.GameMode
 import be.ombres.conseil.mode.GuildsSection
 import be.ombres.conseil.mode.ReadReport
 import be.ombres.conseil.mode.ReadReportSection
+import be.ombres.conseil.mode.RoomKind
 import be.ombres.conseil.mode.copyPlan
 import be.ombres.conseil.ocr.Screen
 import be.ombres.conseil.ui.Bullets
-import be.ombres.conseil.ui.Choice
 import be.ombres.conseil.ui.Field
 import be.ombres.conseil.ui.Hint
 import be.ombres.conseil.ui.NumberedStep
@@ -139,12 +138,5 @@ object CapitaleMode : GameMode {
             }
             OutlinedButton(onClick = { upd { it.copy(ourRooms = it.ourRooms + DcRoom(owner = "nous")) } }, modifier = Modifier.fillMaxWidth()) { Text("Ajouter une salle") }
         }
-    }
-
-    /** Type de salle (lits, production par joueur) et bonus « 50% ». */
-    @Composable
-    private fun RoomKind(type: String, buff: Boolean, onChange: (String, Boolean) -> Unit) {
-        Choice(listOf("" to "?") + RoomType.entries.map { it.name to it.label }, type) { onChange(it, buff) }
-        Choice(listOf(false to "Sans bonus", true to "Bonus 50%"), buff) { onChange(type, it) }
     }
 }

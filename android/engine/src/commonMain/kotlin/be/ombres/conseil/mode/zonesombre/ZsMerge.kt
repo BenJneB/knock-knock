@@ -82,7 +82,7 @@ private fun mergeRooms(input: PlanInput, r: MapReading, notes: MutableList<Strin
                 if (room.dmg != null) append(" · DMG ${room.dmg}")
                 if (room.stolen != null) append(" · voleur déjà là")
             }
-            RoomIn(name, room.shield, b = dmg == null || best == null || dmg < best)
+            RoomIn(name, room.shield, b = dmg == null || best == null || dmg < best, type = room.type?.name ?: "", buff = room.buff)
         }
         st = st.copy(rooms = rooms)
         val rn = short(st.guilds[rival].n)

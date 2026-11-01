@@ -35,7 +35,7 @@ internal fun obj(vararg kv: Pair<String, Any?>): dynamic {
 /** L'état de la page (mêmes champs que PlanInput, valeurs telles que saisies) → PlanInput. */
 private fun input(st: dynamic): PlanInput {
     val guilds = (st.guilds as Array<dynamic>).map { GuildIn(str(it.n), str(it.a), str(it.r), str(it.s)) }
-    val rooms = (st.rooms as Array<dynamic>).map { RoomIn(str(it.n), str(it.sh) == "1", str(it.b) == "1") }
+    val rooms = (st.rooms as Array<dynamic>).map { RoomIn(str(it.n), str(it.sh) == "1", str(it.b) == "1", str(it.type), it.buff == true || str(it.buff) == "1") }
     return PlanInput(
         guilds = guilds, me = (st.me as Number).toInt(),
         th = str(st.th), tm = str(st.tm), round = str(st.round),
@@ -108,7 +108,7 @@ private fun webState(st: PlanInput): dynamic = obj(
     "guilds" to st.guilds.map { obj("n" to it.n, "a" to it.a, "r" to it.r, "s" to it.s) }.toTypedArray(),
     "me" to st.me, "th" to st.th, "tm" to st.tm, "round" to st.round,
     "em" to st.em, "sa" to st.sa, "gi" to st.gi, "ss" to st.ss, "today" to st.today,
-    "rooms" to st.rooms.map { obj("n" to it.n, "sh" to if (it.sh) "1" else "0", "b" to if (it.b) "1" else "0") }.toTypedArray(),
+    "rooms" to st.rooms.map { obj("n" to it.n, "sh" to if (it.sh) "1" else "0", "b" to if (it.b) "1" else "0", "type" to it.type, "buff" to if (it.buff) "1" else "") }.toTypedArray(),
     "shield" to if (st.shield) "1" else "0", "free" to st.free, "freeV" to st.freeV, "sapeP" to st.sapeP,
 )
 

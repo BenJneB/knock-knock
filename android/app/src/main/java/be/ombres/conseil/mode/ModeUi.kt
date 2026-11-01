@@ -20,8 +20,10 @@ import androidx.compose.ui.unit.dp
 import be.ombres.conseil.R
 import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.game.GuildIn
+import be.ombres.conseil.game.RoomType
 import be.ombres.conseil.ui.Art
 import be.ombres.conseil.ui.Bullets
+import be.ombres.conseil.ui.Choice
 import be.ombres.conseil.ui.Field
 import be.ombres.conseil.ui.Hint
 import be.ombres.conseil.ui.Section
@@ -67,4 +69,11 @@ fun copyPlan(context: Context, text: String) {
     context.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Plan de bataille", text))
     // Depuis Android 13, le système confirme lui-même la copie.
     if (Build.VERSION.SDK_INT < 33) Toast.makeText(context, "Plan copié : collez-le dans le chat de guilde.", Toast.LENGTH_SHORT).show()
+}
+
+/** Type de salle (lits, production d'un joueur) et bonus « 50% » : donnent la production de la salle. */
+@Composable
+fun RoomKind(type: String, buff: Boolean, onChange: (String, Boolean) -> Unit) {
+    Choice(listOf("" to "?") + RoomType.entries.map { it.name to it.label }, type) { onChange(it, buff) }
+    Choice(listOf(false to "Sans bonus", true to "Bonus 50%"), buff) { onChange(type, it) }
 }

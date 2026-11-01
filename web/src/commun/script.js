@@ -49,6 +49,15 @@ function drawFields(keys){
 
 $("#reset").onclick = () => { if (!confirm("Effacer toutes les valeurs ?")) return; st = structuredClone(DEF); save(); location.reload(); };
 
+/* ---------- salles : type et bonus ---------- */
+/** Champs « Type » et « Bonus 50% » d'une salle (data-k="type", data-k="buff" : "1" ou vide). */
+function roomKindHtml(){
+  return `
+         <div><label>Type</label><select data-k="type"><option value="">?</option><option value="BASIC">basique</option>
+           <option value="INTERMEDIATE">intermédiaire</option><option value="SUPREME">suprême</option></select></div>
+         <div><label>Bonus 50%</label><select data-k="buff"><option value="">Non</option><option value="1">Oui</option></select></div>`;
+}
+
 /* ---------- affichage du plan ---------- */
 /** Affiche les valeurs manquantes ; vrai s'il y en a. */
 function showErrors(out, errs){
