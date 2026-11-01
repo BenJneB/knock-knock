@@ -91,14 +91,23 @@ class MainActivity : ComponentActivity() {
         setContent { ConseilTheme { Home() } }
     }
 
+    // Démarrage en attente : l'utilisateur est parti autoriser l'affichage par-dessus les autres applis.
+    private var waitingOverlay = false
+
     override fun onResume() {
         super.onResume()
         bubbleOn = BubbleService.running
+        // De retour des réglages avec l'autorisation : on continue le démarrage sans devoir retoucher le bouton.
+        if (waitingOverlay && Settings.canDrawOverlays(this)) {
+            waitingOverlay = false
+            startBubble()
+        }
     }
 
     private fun startBubble() {
         if (!Settings.canDrawOverlays(this)) {
             Toast.makeText(this, "Autorisez « Afficher par-dessus les autres applis », puis revenez.", Toast.LENGTH_LONG).show()
+            waitingOverlay = true
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, "package:$packageName".toUri()))
             return
         }
@@ -134,6 +143,8 @@ class MainActivity : ComponentActivity() {
 
                 Section("Bulle de lecture", R.drawable.ic_bubble) {
                     Hint("La bulle flotte par-dessus le jeu. Touchez-la sur la carte du match ou dans le coffre de cartes : l’écran est lu et le plan s’affiche.")
+                    if (bubbleOn) Hint("Bulle active : elle reste cachée dans cette appli et apparaît sur le jeu, à gauche de l’écran.")
+                    else Hint("Démarrer demande trois accords : affichage par-dessus les autres applis, notifications, puis partage de l’écran (choisir « écran entier »). Sur Xiaomi, autorisez aussi les fenêtres pop-up en arrière-plan dans les réglages de l’appli.")
                     if (!bubbleOn) Button(onClick = ::startBubble, modifier = Modifier.fillMaxWidth()) { Text("Démarrer la bulle") }
                     else OutlinedButton(onClick = { BubbleService.stop(this@MainActivity); bubbleOn = false }, modifier = Modifier.fillMaxWidth()) { Text("Arrêter la bulle") }
                     OutlinedButton(onClick = { pickImage.launch("image/*") }, enabled = !reading, modifier = Modifier.fillMaxWidth()) {
