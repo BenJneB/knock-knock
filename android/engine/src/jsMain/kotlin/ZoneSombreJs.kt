@@ -4,7 +4,15 @@
 
 import be.ombres.conseil.game.GuildIn
 import be.ombres.conseil.map.MapReader
+import be.ombres.conseil.mode.zonesombre.PlanErrors
+import be.ombres.conseil.mode.zonesombre.PlanInput
+import be.ombres.conseil.mode.zonesombre.PlanOk
+import be.ombres.conseil.mode.zonesombre.RoomIn
+import be.ombres.conseil.mode.zonesombre.emptyPlanText
 import be.ombres.conseil.mode.zonesombre.merge
+import be.ombres.conseil.mode.zonesombre.plan
+import be.ombres.conseil.mode.zonesombre.planText
+import be.ombres.conseil.mode.zonesombre.verdict
 import be.ombres.conseil.ocr.CropRequest
 import be.ombres.conseil.ocr.OcrLine
 import be.ombres.conseil.ocr.OcrPage
@@ -15,14 +23,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
 import kotlin.js.Promise
-import be.ombres.conseil.mode.zonesombre.PlanErrors
-import be.ombres.conseil.mode.zonesombre.PlanInput
-import be.ombres.conseil.mode.zonesombre.PlanOk
-import be.ombres.conseil.mode.zonesombre.RoomIn
-import be.ombres.conseil.mode.zonesombre.emptyPlanText
-import be.ombres.conseil.mode.zonesombre.plan
-import be.ombres.conseil.mode.zonesombre.planText
-import be.ombres.conseil.mode.zonesombre.verdict
 
 internal fun str(v: dynamic): String = if (v == null || v == undefined) "" else v.toString()
 
@@ -35,7 +35,7 @@ internal fun obj(vararg kv: Pair<String, Any?>): dynamic {
 /** L'état de la page (mêmes champs que PlanInput, valeurs telles que saisies) → PlanInput. */
 private fun input(st: dynamic): PlanInput {
     val guilds = (st.guilds as Array<dynamic>).map { GuildIn(str(it.n), str(it.a), str(it.r), str(it.s)) }
-    val rooms = (st.rooms as Array<dynamic>).map { RoomIn(str(it.n), str(it.sh) == "1", str(it.b) == "1") }
+    val rooms = (st.rooms as Array<dynamic>).map { RoomIn(str(it.n), str(it.sh) == "1", str(it.b) == "1", str(it.type), it.buff == true || str(it.buff) == "1") }
     return PlanInput(
         guilds = guilds, me = (st.me as Number).toInt(),
         th = str(st.th), tm = str(st.tm), round = str(st.round),
@@ -52,6 +52,7 @@ private fun input(st: dynamic): PlanInput {
 @JsExport
 fun zsPlan(st: dynamic): dynamic = when (val r = plan(input(st))) {
     is PlanErrors -> obj("errs" to r.errs.toTypedArray())
+
     is PlanOk -> {
         val v = verdict(r)
         obj(
@@ -107,7 +108,7 @@ private fun webState(st: PlanInput): dynamic = obj(
     "guilds" to st.guilds.map { obj("n" to it.n, "a" to it.a, "r" to it.r, "s" to it.s) }.toTypedArray(),
     "me" to st.me, "th" to st.th, "tm" to st.tm, "round" to st.round,
     "em" to st.em, "sa" to st.sa, "gi" to st.gi, "ss" to st.ss, "today" to st.today,
-    "rooms" to st.rooms.map { obj("n" to it.n, "sh" to if (it.sh) "1" else "0", "b" to if (it.b) "1" else "0") }.toTypedArray(),
+    "rooms" to st.rooms.map { obj("n" to it.n, "sh" to if (it.sh) "1" else "0", "b" to if (it.b) "1" else "0", "type" to it.type, "buff" to if (it.buff) "1" else "") }.toTypedArray(),
     "shield" to if (st.shield) "1" else "0", "free" to st.free, "freeV" to st.freeV, "sapeP" to st.sapeP,
 )
 

@@ -1,28 +1,21 @@
 package be.ombres.conseil.mode.zonesombre
 
-import be.ombres.conseil.map.*
-import be.ombres.conseil.game.*
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.text.format.DateFormat
-import android.os.Build
 import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,18 +23,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import be.ombres.conseil.R
-import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
 import be.ombres.conseil.core.Reminders
-import be.ombres.conseil.ui.Art
+import be.ombres.conseil.core.SoulHistory
+import be.ombres.conseil.game.jsNum
+import be.ombres.conseil.map.MapReader
+import be.ombres.conseil.map.ScreenKind
+import be.ombres.conseil.mode.Brief
 import be.ombres.conseil.mode.GameMode
+import be.ombres.conseil.mode.GuildsSection
 import be.ombres.conseil.mode.ReadReport
+import be.ombres.conseil.mode.ReadReportSection
+import be.ombres.conseil.mode.RoomKind
+import be.ombres.conseil.mode.copyPlan
 import be.ombres.conseil.ocr.Screen
-import java.util.Date
+import be.ombres.conseil.ui.Art
 import be.ombres.conseil.ui.Bullets
 import be.ombres.conseil.ui.Choice
 import be.ombres.conseil.ui.Field
@@ -49,6 +48,7 @@ import be.ombres.conseil.ui.Hint
 import be.ombres.conseil.ui.Labeled
 import be.ombres.conseil.ui.NumberedStep
 import be.ombres.conseil.ui.Section
+import java.util.Date
 
 object ZoneSombreMode : GameMode {
     override val id = "zone-sombre"
@@ -76,8 +76,18 @@ object ZoneSombreMode : GameMode {
             }
             ZsStore.saveSnapshot(context, snap)
         }
+        if (reading.guilds.size == 3) notes.addAll(SoulHistory.notes(context, id, input.guilds))
         ZsStore.save(context, input)
         return ReadReport(r.summary, r.missing, notes)
+    }
+
+    override fun brief(context: Context): Brief = when (val r = plan(ZsStore.load(context))) {
+        is PlanErrors -> Brief("Il manque des valeurs", r.errs)
+
+        is PlanOk -> Brief(
+            verdict(r).title,
+            r.steps.take(3).mapIndexed { i, s -> "${i + 1}. ${s.t}${if (s.c.isNotEmpty()) " (${s.c})" else ""}" }.ifEmpty { listOf(emptyPlanText(r)) },
+        )
     }
 
     @Composable
@@ -96,15 +106,7 @@ object ZoneSombreMode : GameMode {
         var st by remember { mutableStateOf(ZsStore.load(context)) }
         fun upd(f: (PlanInput) -> PlanInput) { st = f(st); ZsStore.save(context, st) }
 
-        if (report != null) Section("Lecture", R.drawable.ic_eye, MaterialTheme.colorScheme.tertiaryContainer) {
-            Text(report.summary)
-            if (report.notes.isNotEmpty()) Bullets(report.notes)
-            if (report.missing.isNotEmpty()) {
-                Text("À vérifier ou saisir :", fontWeight = FontWeight.Bold)
-                Bullets(report.missing)
-            }
-            if (Analyzer.hasLast(context)) OutlinedButton(onClick = { Analyzer.shareLast(context) }) { Text("Signaler une lecture ratée") }
-        }
+        if (report != null) ReadReportSection(context, report)
 
         PlanView(context, plan(st))
         Inputs(st, ::upd)
@@ -129,7 +131,7 @@ object ZoneSombreMode : GameMode {
                     NumberedStep(i + 1, s.t, s.d, s.c, if ("Sape" in s.c) ({ SapeReminder(context, s.t) }) else null)
                 }
             }
-            OutlinedButton(onClick = { copyPlan(context, r) }) { Text("Copier le plan") }
+            OutlinedButton(onClick = { copyPlan(context, planText(r)) }) { Text("Copier le plan") }
         }
         if (r.keep.isNotEmpty()) Section("Cartes", R.drawable.ic_cards) { Bullets(r.keep) }
         if (r.threats.isNotEmpty()) Section("À surveiller", R.drawable.ic_eye) { Bullets(r.threats) }
@@ -137,22 +139,11 @@ object ZoneSombreMode : GameMode {
 
     @Composable
     private fun Inputs(st: PlanInput, upd: ((PlanInput) -> PlanInput) -> Unit) {
-        Section("Les trois guildes", R.drawable.ic_house) {
-            Hint("Lues dans le bandeau du haut. Corrigez si besoin ; « Nous » = votre guilde.")
-            st.guilds.forEachIndexed { i, g ->
-                fun set(ng: GuildIn) = upd { s -> s.copy(guilds = s.guilds.toMutableList().also { it[i] = ng }) }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Field("Nom de la guilde", g.n, { set(g.copy(n = it)) }, Modifier.weight(1f), KeyboardType.Text)
-                    RadioButton(selected = st.me == i, onClick = { upd { it.copy(me = i) } })
-                    Text("Nous")
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Field("Âme", g.a, { set(g.copy(a = it)) }, Modifier.weight(1.4f), KeyboardType.Text) { Art(R.drawable.ic_flame, 20) }
-                    Field("Prod. /s", g.r, { set(g.copy(r = it)) }, Modifier.weight(1f), KeyboardType.Decimal)
-                    Field("Salles", g.s, { set(g.copy(s = it)) }, Modifier.weight(0.9f))
-                }
-            }
-        }
+        GuildsSection(
+            st.guilds, st.me,
+            onGuild = { i, g -> upd { s -> s.copy(guilds = s.guilds.toMutableList().also { it[i] = g }) } },
+            onMe = { i -> upd { it.copy(me = i) } },
+        )
 
         Section("Temps et tour", R.drawable.ic_hourglass) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -179,7 +170,7 @@ object ZoneSombreMode : GameMode {
             st.rooms.forEachIndexed { i, r ->
                 fun set(nr: RoomIn) = upd { s -> s.copy(rooms = s.rooms.toMutableList().also { it[i] = nr }) }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (r.sh) Art(R.drawable.ic_shield_bubble, 28, Modifier.padding(end = 6.dp))
+                    if (r.sh) Art(R.drawable.ic_shield_bubble, Modifier.padding(end = 6.dp), 28)
                     Field("Salle", r.n, { set(r.copy(n = it)) }, Modifier.weight(1f), KeyboardType.Text)
                     IconButton(onClick = { upd { s -> s.copy(rooms = s.rooms.toMutableList().also { it.removeAt(i) }) } }) { Text("✕") }
                 }
@@ -187,6 +178,7 @@ object ZoneSombreMode : GameMode {
                     Labeled("Bouclier", R.drawable.ic_shield_bubble) { Choice(listOf(false to "Non", true to "Oui"), r.sh) { set(r.copy(sh = it)) } }
                     Labeled("Battable") { Choice(listOf(true to "Oui", false to "Non"), r.b) { set(r.copy(b = it)) } }
                 }
+                RoomKind(r.type, r.buff) { t, b -> set(r.copy(type = t, buff = b)) }
             }
             OutlinedButton(onClick = { upd { it.copy(rooms = it.rooms + RoomIn()) } }) { Text("Ajouter une salle") }
         }
@@ -200,17 +192,9 @@ object ZoneSombreMode : GameMode {
     @Composable
     private fun CardField(label: String, @DrawableRes icon: Int, value: String, onChange: (String) -> Unit, modifier: Modifier) {
         Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-            Art(icon, 34)
+            Art(icon, size = 34)
             Field(label, value, onChange, Modifier.fillMaxWidth())
         }
-    }
-
-    /** Copie le plan en texte, à coller dans le chat de guilde. */
-    private fun copyPlan(context: Context, r: PlanOk) {
-        val cm = context.getSystemService(ClipboardManager::class.java)
-        cm.setPrimaryClip(ClipData.newPlainText("Plan de bataille", planText(r)))
-        // Depuis Android 13, le système confirme lui-même la copie.
-        if (Build.VERSION.SDK_INT < 33) Toast.makeText(context, "Plan copié : collez-le dans le chat de guilde.", Toast.LENGTH_SHORT).show()
     }
 
     /** Une Sape dure 2 h : rappel à la fin, pour décider de la suite. */

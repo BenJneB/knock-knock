@@ -1,14 +1,21 @@
 package be.ombres.conseil.mode.capitale
 
 import be.ombres.conseil.game.GuildIn
-import be.ombres.conseil.map.GuildRead
 import be.ombres.conseil.map.FreeRoom
+import be.ombres.conseil.map.GuildRead
+import be.ombres.conseil.map.MapReader
 import be.ombres.conseil.map.MapReading
 import be.ombres.conseil.map.RoomRead
 import be.ombres.conseil.map.ScreenKind
+import be.ombres.conseil.ocr.Pixels
+import be.ombres.conseil.ocr.RecordedScreen
+import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
+import javax.imageio.ImageIO
 
 class DcPlanTest {
 
@@ -75,5 +82,31 @@ class DcPlanTest {
     fun missingValuesAreReported() {
         val r = dcPlan(DcInput(guilds = listOf(GuildIn("s40-Ombres"), GuildIn(), GuildIn()))) as DcErrors
         assertEquals(3, r.errs.size)
+    }
+
+    /** De bout en bout sur une vraie capture de la capitale : lecture ML Kit enregistrée, report, plan. */
+    @Test
+    fun realCapitaleCapture() {
+        val json = JSONObject(javaClass.classLoader!!.getResource("ocr/exemple-ecran-capitale.json").readText())
+        val img = ImageIO.read(File("../../captures/exemple-ecran-capitale.jpeg"))
+        val pixels = object : Pixels {
+            override val width = img.width
+            override val height = img.height
+            override fun rgb(x: Int, y: Int) = img.getRGB(x, y) and 0xFFFFFF
+        }
+        val reading = runBlocking {
+            MapReader.read(RecordedScreen(json, pixels), "s40-Ombres")
+        }
+        val st = dcMerge(DcInput(), reading, "s40-Ombres").input
+        assertEquals("2.02B", st.ourDmg)
+        val r = dcPlan(st) as DcOk
+        assertEquals(2, r.rankBefore)
+        // Nos 2 salles intermédiaires (3 lits × 4/s) donnent 24/s : déjà pleines.
+        assertTrue(r.steps[0].d.endsWith("Vos salles semblent pleines (24/s sur 24/s possibles)."))
+        // Une tentative : la salle de Nexus (devant nous) avec bonus, 18/s pleine, compte double.
+        assertEquals("Défier bas à droite · DMG 506.19M (Nexus)", r.steps[1].t)
+        assertTrue(r.steps[1].d.endsWith("(salle intermédiaire avec bonus : 18/s pleine)."))
+        // La salle suprême de Nexus a son record caché : pas proposée, signalée.
+        assertTrue(r.defense.contains("Record illisible pour milieu au centre (Nexus) : vérifiez-le dans le jeu avant de la défier."))
     }
 }

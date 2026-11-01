@@ -1,0 +1,13 @@
+# Mises à jour proposées automatiquement (pull requests), notamment de sécurité : dépendances Gradle de l'appli et
+# du moteur, et actions utilisées par la CI. Gratuit sur GitHub.
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

@@ -1,7 +1,12 @@
 package be.ombres.conseil.mode.zonesombre
-
-import be.ombres.conseil.map.*
-import be.ombres.conseil.game.*
+import be.ombres.conseil.game.int
+import be.ombres.conseil.game.jsNum
+import be.ombres.conseil.game.parseNum
+import be.ombres.conseil.map.MapReading
+import be.ombres.conseil.map.ScreenKind
+import be.ombres.conseil.map.mergeBanner
+import be.ombres.conseil.map.roomCountChecks
+import be.ombres.conseil.map.short
 
 /** Ce qu'une capture a apporté : les valeurs mises à jour, et un résumé pour l'utilisateur. */
 data class ZsMergeResult(val input: PlanInput, val summary: String, val missing: List<String>, val notes: List<String> = emptyList())
@@ -77,7 +82,7 @@ private fun mergeRooms(input: PlanInput, r: MapReading, notes: MutableList<Strin
                 if (room.dmg != null) append(" · DMG ${room.dmg}")
                 if (room.stolen != null) append(" · voleur déjà là")
             }
-            RoomIn(name, room.shield, b = dmg == null || best == null || dmg < best)
+            RoomIn(name, room.shield, b = dmg == null || best == null || dmg < best, type = room.type?.name ?: "", buff = room.buff)
         }
         st = st.copy(rooms = rooms)
         val rn = short(st.guilds[rival].n)

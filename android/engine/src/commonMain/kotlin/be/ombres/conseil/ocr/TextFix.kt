@@ -40,12 +40,12 @@ class Votes<T> {
     fun best(): T? = score.entries.maxByOrNull { it.value }?.key
 
     /**
-     * Comme [best], mais une valeur qui n'est que la fin d'une autre (« 28K » pour « 876.28K », nombre coupé
-     * en deux mots à la lecture) apporte ses voix à la plus longue.
+     * Comme [best], mais une valeur « absorbée » par une autre lui apporte ses voix ; par défaut, celle qui n'en est
+     * que la fin (« 28K » pour « 876.28K », nombre coupé en deux mots à la lecture).
      */
-    fun bestMerged(): T? {
+    fun bestMerged(absorbs: (long: String, short: String) -> Boolean = { long, short -> long.endsWith(short) }): T? {
         val merged = score.mapValues { (k, v) ->
-            v + score.filterKeys { o -> o != k && k.toString().endsWith(o.toString()) }.values.sum()
+            v + score.filterKeys { o -> o != k && absorbs(k.toString(), o.toString()) }.values.sum()
         }
         return merged.entries.maxByOrNull { it.value }?.key
     }

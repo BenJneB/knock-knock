@@ -23,7 +23,9 @@ class OcrDumpTest {
         val ins = InstrumentationRegistry.getInstrumentation()
         val assets = ins.context.assets
         val out = File(ins.targetContext.getExternalFilesDir(null), "ocr").apply { deleteRecursively(); mkdirs() }
-        for (name in assets.list("")!!.filter { it.endsWith(".jpeg") || it.endsWith(".jpg") || it.endsWith(".png") }) {
+        // Les captures des règles (regle-*) servent à lire les règles, pas de cas de test.
+        val images = assets.list("")!!.filter { (it.endsWith(".jpeg") || it.endsWith(".jpg") || it.endsWith(".png")) && !it.startsWith("regle-") }
+        for (name in images) {
             val bmp = assets.open(name).use { BitmapFactory.decodeStream(it) }
             val screen = RecordingScreen(BitmapScreen.of(bmp))
             val reading = MapReader.read(screen)

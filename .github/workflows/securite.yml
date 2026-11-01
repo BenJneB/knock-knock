@@ -1,0 +1,88 @@
+# Contrôles de sécurité (gratuits sur un dépôt public) :
+# - CodeQL : analyse du code Kotlin (appli, moteur) et du JavaScript des pages web ;
+# - OSV-Scanner : dépendances JavaScript (outils de compilation du moteur web) ayant une faille connue.
+# Les dépendances Gradle sont suivies par Dependabot (.github/dependabot.yml).
+# Les résultats apparaissent dans l'onglet Security du dépôt.
+name: Sécurité
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1" # chaque lundi : nouvelles failles publiées depuis
+
+permissions:
+  contents: read
+
+jobs:
+  codeql:
+    runs-on: ubuntu-24.04 # fixé : un changement d'image ne doit pas casser la CI sans prévenir
+    timeout-minutes: 40
+    permissions:
+      security-events: write
+      contents: read
+    env:
+      # Kotlin se compile (mode « manual ») : l'analyse rapide « overlay » n'existe que sans compilation. On ne la
+      # tente pas, ce qui évite l'avertissement ; valeur vide (ignorée) pour le JavaScript, qui la garde.
+      CODEQL_OVERLAY_DATABASE_MODE: ${{ matrix.build-mode == 'manual' && 'none' || '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: java-kotlin
+            build-mode: manual
+          - language: javascript-typescript
+            build-mode: none
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        if: matrix.language == 'java-kotlin'
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v6
+        if: matrix.language == 'java-kotlin'
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # Pour le JavaScript : les sources des pages (web/src), pas le moteur compilé.
+          config: |
+            paths-ignore:
+              - web/dist
+              - android/**/build
+
+      - name: Compilation analysée (Kotlin)
+        if: matrix.language == 'java-kotlin'
+        working-directory: android
+        run: ./gradlew --no-build-cache :engine:compileKotlinJvm :app:compileDebugKotlin
+
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:${{ matrix.language }}
+
+  dependances-js:
+    runs-on: ubuntu-24.04 # fixé : un changement d'image ne doit pas casser la CI sans prévenir
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      # Version exacte : le comportement de l'action peut changer d'une version mineure à l'autre.
+      # Échoue si une dépendance a une faille connue ; les résultats vont aussi dans l'onglet Security.
+      - uses: google/osv-scanner-action/osv-scanner-action@v2.7.0
+        with:
+          scan-args: |-
+            --format=sarif
+            --output=osv.sarif
+            --lockfile=android/kotlin-js-store/yarn.lock
+
+      - uses: github/codeql-action/upload-sarif@v4
+        if: always() && hashFiles('osv.sarif') != ''
+        with:
+          sarif_file: osv.sarif
+          category: osv-scanner

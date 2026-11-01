@@ -1,0 +1,35 @@
+# Style du code Kotlin, vérifié par ktlint (./gradlew ktlintCheck ; corriger : ./gradlew ktlintFormat).
+root = true
+
+[*.{kt,kts}]
+indent_size = 4
+insert_final_newline = true
+ktlint_code_style = intellij_idea
+# Lignes longues acceptées : textes en français et appels chaînés lisibles sur une ligne.
+max_line_length = off
+# Composables Compose : nommés comme des classes (PlanView, GuildsSection…).
+ktlint_function_naming_ignore_when_annotated_with = Composable
+# Règles qui imposeraient un reformatage massif sans gain de lisibilité ici.
+ktlint_standard_function-signature = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_class-signature = disabled
+ktlint_standard_function-expression-body = disabled
+ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_parameter-list-wrapping = disabled
+ktlint_standard_wrapping = disabled
+ktlint_standard_if-else-wrapping = disabled
+ktlint_standard_if-else-bracing = disabled
+ktlint_standard_statement-wrapping = disabled
+ktlint_standard_property-naming = disabled
+ktlint_standard_backing-property-naming = disabled
+ktlint_standard_blank-line-before-declaration = disabled
+ktlint_standard_string-template-indent = disabled
+ktlint_standard_multiline-if-else = disabled
+ktlint_standard_condition-wrapping = disabled
+ktlint_standard_function-literal = disabled
+ktlint_standard_discouraged-comment-location = disabled
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+# Fichiers nommés d’après leur rôle (DcMerge.kt : fusion d’une lecture et son résultat).
+ktlint_standard_filename = disabled

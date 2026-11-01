@@ -25,9 +25,9 @@ fun dcMerge(input: DcInput, r: MapReading, ourGuild: String): DcMergeResult {
         else {
             val label = { pos: String, dmg: String? -> if (dmg != null) "$pos · DMG $dmg" else pos }
             val enemy = r.rooms.filter { it.guild != null && it.guild != st.me }
-                .map { DcRoom(label(it.pos, it.dmg), short(st.guilds[it.guild!!].n), it.dmg ?: "") }
-            val free = r.free.map { DcRoom(it.pos, "", "", it.rate ?: "") }
-            val ours = r.rooms.filter { it.guild == st.me }.map { DcRoom(it.pos, short(st.guilds[st.me].n), it.dmg ?: "") }
+                .map { DcRoom(label(it.pos, it.dmg), short(st.guilds[it.guild!!].n), it.dmg ?: "", "", it.type?.name ?: "", it.buff) }
+            val free = r.free.map { DcRoom(it.pos, "", "", it.rate ?: "", it.type?.name ?: "", it.buff) }
+            val ours = r.rooms.filter { it.guild == st.me }.map { DcRoom(it.pos, short(st.guilds[st.me].n), it.dmg ?: "", "", it.type?.name ?: "", it.buff) }
             st = st.copy(rooms = enemy + free.filter { it.rate.isNotEmpty() }, ourRooms = ours)
             parts.add("salles")
             // Sans aucune étiquette lue, comparer aux salles annoncées n'apprend rien (lecture incomplète).
