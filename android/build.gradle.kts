@@ -26,5 +26,15 @@ allprojects {
     }
     plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
         the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec>().downloadBaseUrl.set(null as String?)
+        // Outils de compilation et de test du moteur JavaScript (webpack, mocha) : versions corrigées de dépendances
+        // ayant une faille connue (contrôle OSV-Scanner de la CI). Retirer une ligne quand l'outil l'intègre.
+        the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec>().resolutions.addAll(
+            listOf(
+                "diff" to "8.0.3", // GHSA-73rr-hh4g-fpgx
+                "glob" to "14.0.2", // GHSA-3g3m-2fjr-6pw4
+                "minimatch" to "11.0.1", // GHSA-g3hv-75wg-m249
+                "serialize-javascript" to "7.1.3", // GHSA-5c6j-r48x-rmvq, GHSA-m5mm-p8h7-m29v, GHSA-qj8w-gfj5-8c6v
+            ).map { (name, version) -> org.jetbrains.kotlin.gradle.targets.js.yarn.YarnResolution(name).apply { include(version) } },
+        )
     }
 }

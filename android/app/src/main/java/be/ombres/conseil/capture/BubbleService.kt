@@ -153,7 +153,17 @@ class BubbleService : Service() {
             }
             true
         }
-        wm.addView(v, lp)
+        try {
+            wm.addView(v, lp)
+        } catch (e: Exception) {
+            // Certains téléphones (Xiaomi notamment) refusent la fenêtre malgré l'autorisation Android standard.
+            Log.w("Conseil", "Bulle refusée par le téléphone", e)
+            lastError = "Le téléphone a refusé d’afficher la bulle. Sur Xiaomi : Autorisations Xiaomi > fenêtres pop-up en arrière-plan et fenêtres flottantes."
+            Toast.makeText(this, lastError, Toast.LENGTH_LONG).show()
+            stopSelf()
+            return
+        }
+        lastError = null
         bubble = v
         applyAppVisible()
     }
@@ -306,6 +316,10 @@ class BubbleService : Service() {
         private const val EXTRA_DATA = "data"
 
         @Volatile var running = false
+            private set
+
+        /** Dernier échec d'affichage de la bulle, montré sur l'écran d'accueil ; null si tout va bien. */
+        @Volatile var lastError: String? = null
             private set
 
         // Référence faible : le service ne doit pas être retenu en mémoire par un champ statique.

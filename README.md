@@ -117,6 +117,17 @@ ajouté à `Modes.all`).
 - Node : version fixée pour le moteur JavaScript (`android/build.gradle.kts`, alignée avec la CI), à mettre à jour
   lors des correctifs de sécurité de Node.js.
 
+## Sécurité
+
+- **Aucune connexion** : l'APK ne demande aucune autorisation réseau (celles qu'ajoute ML Kit sont retirées dans le
+  manifeste). `tools/verifier-autorisations.sh` le vérifie dans la CI : toute autorisation inattendue la fait échouer.
+- **Captures** : seule la dernière lecture est gardée, dans le cache privé de l'appli ; elle n'est envoyée que si
+  l'utilisateur touche « Signaler une lecture ratée ».
+- **CI « Sécurité »** (`.github/workflows/securite.yml`, chaque push sur master et chaque lundi) : CodeQL sur le
+  Kotlin et le JavaScript, OSV-Scanner sur les outils JavaScript (`kotlin-js-store/yarn.lock`), revue des dépendances
+  des pull requests. Les versions corrigées forcées sont listées dans `android/build.gradle.kts`.
+- **Dependabot** (`.github/dependabot.yml`) propose chaque semaine les mises à jour des dépendances Gradle et des actions.
+
 
 - `ZsPlanGoldenTest` : 400 scénarios de référence (non-régression du moteur), vérifiés aussi sur la
   version JavaScript par `tools/check-web-engine.mjs`.
