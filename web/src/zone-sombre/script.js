@@ -1,4 +1,6 @@
 // Script de la page zone-sombre (assemblée par « ./gradlew :engine:webPage »). Code commun : ../commun/script.js.
+// Fournis par le moteur (conseil) et par ../commun/script.js, inclus avant ce script dans la page assemblée.
+/* global conseil, $, el, tag, load, save, drawGuilds, drawFields, roomKindHtml, readCapture, showErrors, planBox, listBox */
 const STORE = "zs-chefs-v1";
 const DEF = { guilds:[{n:"s40-Ombres",a:"",r:"",s:""},{n:"",a:"",r:"",s:""},{n:"",a:"",r:"",s:""}], me:0,
   th:"", tm:"", round:"1", em:"", sa:"", gi:"", ss:"", today:"", rooms:[], shield:"1", free:"0", freeV:"3", sapeP:"25" };
@@ -17,13 +19,13 @@ function drawRooms(){
       <div><label>Salle</label><input type="text" placeholder="haut gauche" data-k="n"></div>
       <div><label>Bouclier</label><select data-k="sh"><option value="0">Non</option><option value="1">Oui</option></select></div>
       <div><label>Battable</label><select data-k="b"><option value="1">Oui</option><option value="0">Non</option></select></div>
-      <button class="x" type="button" aria-label="Retirer la salle">×</button>`;
+      <button class="x" type="button" aria-label="Retirer la salle">×</button>${roomKindHtml()}`;
     d.querySelectorAll("[data-k]").forEach(inp => { inp.value = r[inp.dataset.k] ?? ""; inp.oninput = inp.onchange = () => { r[inp.dataset.k] = inp.value; save(); }; });
     d.querySelector(".x").onclick = () => { st.rooms.splice(i, 1); save(); drawRooms(); };
     box.append(d);
   });
 }
-$("#addRoom").onclick = () => { st.rooms.push({ n:"", sh:"0", b:"1" }); save(); drawRooms(); };
+$("#addRoom").onclick = () => { st.rooms.push({ n:"", sh:"0", b:"1", type:"", buff:"" }); save(); drawRooms(); };
 
 /* ---------- simple fields ---------- */
 const FIELDS = ["th","tm","round","em","sa","gi","ss","today","shield","free","freeV","sapeP"];

@@ -1,6 +1,7 @@
 package be.ombres.conseil.mode.capitale
 
 import android.content.Context
+import androidx.core.content.edit
 import be.ombres.conseil.game.GuildIn
 import org.json.JSONArray
 import org.json.JSONObject
@@ -12,12 +13,12 @@ object DcStore {
     fun load(c: Context): DcInput =
         sp(c).getString("input", null)?.let { runCatching { fromJson(JSONObject(it)) }.getOrNull() } ?: DcInput()
 
-    fun save(c: Context, st: DcInput) = sp(c).edit().putString("input", toJson(st).toString()).apply()
+    fun save(c: Context, st: DcInput) = sp(c).edit { putString("input", toJson(st).toString()) }
 
-    private fun rooms(rs: List<DcRoom>) = JSONArray(rs.map { JSONObject().put("n", it.n).put("owner", it.owner).put("dmg", it.dmg).put("rate", it.rate) })
+    private fun rooms(rs: List<DcRoom>) = JSONArray(rs.map { JSONObject().put("n", it.n).put("owner", it.owner).put("dmg", it.dmg).put("rate", it.rate).put("type", it.type).put("buff", it.buff) })
 
     private fun rooms(a: JSONArray?) = if (a == null) emptyList() else List(a.length()) {
-        a.getJSONObject(it).run { DcRoom(optString("n"), optString("owner"), optString("dmg"), optString("rate")) }
+        a.getJSONObject(it).run { DcRoom(optString("n"), optString("owner"), optString("dmg"), optString("rate"), optString("type"), optBoolean("buff")) }
     }
 
     fun toJson(st: DcInput): JSONObject = JSONObject()

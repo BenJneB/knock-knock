@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
@@ -30,12 +31,16 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.graphics.createBitmap
 import be.ombres.conseil.CouncilActivity
 import be.ombres.conseil.MainActivity
 import be.ombres.conseil.R
 import be.ombres.conseil.core.Analyzer
 import be.ombres.conseil.core.Prefs
+import be.ombres.conseil.mode.Brief
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -73,6 +78,7 @@ class BubbleService : Service() {
         else startForeground(1, notification())
 
         val code = intent?.getIntExtra(EXTRA_CODE, 0) ?: 0
+
         @Suppress("DEPRECATION")
         val data: Intent? = intent?.getParcelableExtra(EXTRA_DATA)
         if (data == null) { stopSelf(); return START_NOT_STICKY }
@@ -109,7 +115,8 @@ class BubbleService : Service() {
             return b.width() to b.height()
         }
         val m = DisplayMetrics()
-        @Suppress("DEPRECATION") wm.defaultDisplay.getRealMetrics(m)
+        @Suppress("DEPRECATION")
+        wm.defaultDisplay.getRealMetrics(m)
         return m.widthPixels to m.heightPixels
     }
 
@@ -135,16 +142,28 @@ class BubbleService : Service() {
         v.setOnTouchListener { _, e ->
             when (e.action) {
                 MotionEvent.ACTION_DOWN -> { downX = e.rawX; downY = e.rawY; startX = lp.x; startY = lp.y; moved = false }
+
                 MotionEvent.ACTION_MOVE -> {
                     val dx = e.rawX - downX; val dy = e.rawY - downY
                     if (abs(dx) > 12 || abs(dy) > 12) moved = true
                     if (moved) { lp.x = startX + dx.toInt(); lp.y = startY + dy.toInt(); wm.updateViewLayout(v, lp) }
                 }
+
                 MotionEvent.ACTION_UP -> if (!moved) capture()
             }
             true
         }
-        wm.addView(v, lp)
+        try {
+            wm.addView(v, lp)
+        } catch (e: Exception) {
+            // Certains téléphones (Xiaomi notamment) refusent la fenêtre malgré l'autorisation Android standard.
+            Log.w("Conseil", "Bulle refusée par le téléphone", e)
+            lastError = "Le téléphone a refusé d’afficher la bulle. Sur Xiaomi : Autorisations Xiaomi > fenêtres pop-up en arrière-plan et fenêtres flottantes."
+            Toast.makeText(this, lastError, Toast.LENGTH_LONG).show()
+            stopSelf()
+            return
+        }
+        lastError = null
         bubble = v
         applyAppVisible()
     }
@@ -189,13 +208,67 @@ class BubbleService : Service() {
             return@launch
         }
         Prefs.setLastReport(this@BubbleService, report)
-        startActivity(Intent(this@BubbleService, CouncilActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        if (Prefs.miniPlan(this@BubbleService)) showBrief(report.summary, Prefs.mode(this@BubbleService).brief(this@BubbleService))
+        else openCouncil()
+    }
+
+    private fun openCouncil() {
+        startActivity(Intent(this, CouncilActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+    }
+
+    /** Mini-plan par-dessus le jeu : verdict, premières actions, « Détails » (écran complet) et « Fermer ». */
+    private fun showBrief(summary: String, brief: Brief) {
+        hideBrief()
+        val dp = resources.displayMetrics.density
+        fun text(t: String, size: Float, color: Int, bold: Boolean = false) = TextView(this).apply {
+            text = t; textSize = size; setTextColor(color); if (bold) setTypeface(typeface, Typeface.BOLD)
+            setPadding(0, (2 * dp).toInt(), 0, (2 * dp).toInt())
+        }
+        fun button(t: String, action: () -> Unit) = TextView(this).apply {
+            text = t; textSize = 15f; setTextColor(0xFF2E1D45.toInt()); setTypeface(typeface, Typeface.BOLD)
+            background = GradientDrawable().apply { cornerRadius = 20 * dp; setColor(0xFFF2C14E.toInt()) }
+            setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
+            setOnClickListener { action() }
+        }
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((16 * dp).toInt(), (12 * dp).toInt(), (16 * dp).toInt(), (12 * dp).toInt())
+            background = GradientDrawable().apply { cornerRadius = 16 * dp; setColor(0xF02E1D45.toInt()); setStroke((2 * dp).toInt(), 0xFF3FB8C9.toInt()) }
+            addView(text(brief.title, 18f, 0xFFF2C14E.toInt(), bold = true))
+            addView(text(summary, 12f, 0xFFB6A9C6.toInt()))
+            brief.lines.forEach { addView(text(it, 14f, 0xFFF1EAF8.toInt())) }
+            addView(LinearLayout(this@BubbleService).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, (8 * dp).toInt(), 0, 0)
+                addView(button("Détails") { hideBrief(); openCouncil() })
+                addView(android.widget.Space(this@BubbleService), LinearLayout.LayoutParams((12 * dp).toInt(), 1))
+                addView(button("Fermer") { hideBrief() })
+            })
+        }
+        val lp = WindowManager.LayoutParams(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(), WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT,
+        ).apply { gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL; y = (90 * dp).toInt() }
+        wm.addView(card, lp)
+        briefView = card
+        main.postDelayed(closeBrief, 30_000) // se ferme seul après 30 s
+    }
+
+    private var briefView: View? = null
+    private val closeBrief = Runnable { hideBrief() }
+
+    private fun hideBrief() {
+        main.removeCallbacks(closeBrief)
+        briefView?.let { runCatching { wm.removeView(it) } }
+        briefView = null
     }
 
     private fun toBitmap(img: Image): Bitmap {
         val plane = img.planes[0]
         val rowPx = plane.rowStride / plane.pixelStride
-        val raw = Bitmap.createBitmap(rowPx, img.height, Bitmap.Config.ARGB_8888)
+        val raw = createBitmap(rowPx, img.height)
         plane.buffer.rewind()
         raw.copyPixelsFromBuffer(plane.buffer)
         if (rowPx == img.width) return raw
@@ -219,6 +292,7 @@ class BubbleService : Service() {
 
     override fun onDestroy() {
         scope.cancel()
+        hideBrief()
         bubble?.let { runCatching { wm.removeView(it) } }
         display?.release()
         projection?.stop()
@@ -232,7 +306,7 @@ class BubbleService : Service() {
     override fun onCreate() {
         super.onCreate()
         running = true
-        instance = this
+        instance = java.lang.ref.WeakReference(this)
     }
 
     companion object {
@@ -244,13 +318,18 @@ class BubbleService : Service() {
         @Volatile var running = false
             private set
 
-        private var instance: BubbleService? = null
+        /** Dernier échec d'affichage de la bulle, montré sur l'écran d'accueil ; null si tout va bien. */
+        @Volatile var lastError: String? = null
+            private set
+
+        // Référence faible : le service ne doit pas être retenu en mémoire par un champ statique.
+        private var instance: java.lang.ref.WeakReference<BubbleService>? = null
         private var appScreens = 0
 
         /** À appeler dans onStart (+1) et onStop (-1) de nos écrans : la bulle s'y cache. */
         fun appScreen(delta: Int) {
             appScreens = (appScreens + delta).coerceAtLeast(0)
-            instance?.applyAppVisible()
+            instance?.get()?.applyAppVisible()
         }
 
         fun start(c: Context, resultCode: Int, data: Intent) {

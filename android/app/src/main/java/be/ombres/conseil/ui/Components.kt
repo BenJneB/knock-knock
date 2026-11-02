@@ -57,7 +57,7 @@ fun GameHeader(subtitle: String) {
 
 /** Icône colorée (cartes, bouclier, flamme…), dessinée telle quelle. */
 @Composable
-fun Art(@DrawableRes id: Int, size: Int = 22, modifier: Modifier = Modifier) {
+fun Art(@DrawableRes id: Int, modifier: Modifier = Modifier, size: Int = 22) {
     Image(painterResource(id), null, modifier.size(size.dp))
 }
 
@@ -121,7 +121,7 @@ fun <T> Choice(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Uni
 fun Labeled(label: String, @DrawableRes icon: Int? = null, content: @Composable RowScope.() -> Unit) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (icon != null) Art(icon, 18, Modifier.padding(end = 4.dp))
+            if (icon != null) Art(icon, Modifier.padding(end = 4.dp), 18)
             Text(label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
         }
         Row(verticalAlignment = Alignment.CenterVertically, content = content)
@@ -148,7 +148,7 @@ fun NumberedStep(n: Int, title: String, detail: String, tag: String, action: (@C
             Text(detail, style = MaterialTheme.typography.bodyMedium)
             if (tag.isNotEmpty()) Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(50), modifier = Modifier.padding(top = 4.dp)) {
                 Row(Modifier.padding(horizontal = 8.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                    cardIcons(tag).forEach { Art(it, 18, Modifier.padding(end = 4.dp)) }
+                    cardIcons(tag).forEach { Art(it, Modifier.padding(end = 4.dp), 18) }
                     Text(tag, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             }

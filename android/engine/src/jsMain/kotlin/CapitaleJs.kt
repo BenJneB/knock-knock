@@ -18,7 +18,7 @@ import kotlin.js.Promise
 
 private fun dcRooms(a: dynamic): List<DcRoom> =
     if (a == null || a == undefined) emptyList()
-    else (a as Array<dynamic>).map { DcRoom(str(it.n), str(it.owner), str(it.dmg), str(it.rate)) }
+    else (a as Array<dynamic>).map { DcRoom(str(it.n), str(it.owner), str(it.dmg), str(it.rate), str(it.type), it.buff == true) }
 
 private fun dcInput(st: dynamic) = DcInput(
     guilds = (st.guilds as Array<dynamic>).map { GuildIn(str(it.n), str(it.a), str(it.r), str(it.s)) },
@@ -27,17 +27,20 @@ private fun dcInput(st: dynamic) = DcInput(
     rooms = dcRooms(st.rooms), ourRooms = dcRooms(st.ourRooms),
 )
 
+private fun room(r: DcRoom): dynamic = obj("n" to r.n, "owner" to r.owner, "dmg" to r.dmg, "rate" to r.rate, "type" to r.type, "buff" to r.buff)
+
 private fun dcState(st: DcInput): dynamic = obj(
     "guilds" to st.guilds.map { obj("n" to it.n, "a" to it.a, "r" to it.r, "s" to it.s) }.toTypedArray(),
     "me" to st.me, "th" to st.th, "tm" to st.tm, "attempts" to st.attempts, "ourDmg" to st.ourDmg,
-    "rooms" to st.rooms.map { obj("n" to it.n, "owner" to it.owner, "dmg" to it.dmg, "rate" to it.rate) }.toTypedArray(),
-    "ourRooms" to st.ourRooms.map { obj("n" to it.n, "owner" to it.owner, "dmg" to it.dmg, "rate" to it.rate) }.toTypedArray(),
+    "rooms" to st.rooms.map { room(it) }.toTypedArray(),
+    "ourRooms" to st.ourRooms.map { room(it) }.toTypedArray(),
 )
 
 /** Plan du mode Défense de la capitale : { errs } ou { title, good, lines, steps, defense, text }. */
 @JsExport
 fun dcPlanJs(st: dynamic): dynamic = when (val r = dcPlan(dcInput(st))) {
     is DcErrors -> obj("errs" to r.errs.toTypedArray())
+
     is DcOk -> {
         val v = dcVerdict(r)
         obj(

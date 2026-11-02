@@ -1,7 +1,9 @@
 package be.ombres.conseil.mode.zonesombre
 
-import be.ombres.conseil.map.*
-import be.ombres.conseil.game.*
+import be.ombres.conseil.game.int
+import be.ombres.conseil.game.jsNum
+import be.ombres.conseil.game.parseNum
+import be.ombres.conseil.map.RoomRead
 import kotlin.math.abs
 import kotlin.math.floor
 

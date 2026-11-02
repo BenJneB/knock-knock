@@ -1,11 +1,17 @@
 package be.ombres.conseil.ocr
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
 /** Traitement appliqué à une zone avant la lecture. */
 enum class Filter {
     COLOR,
     GRAY,
+
     /** Ne garde que le texte blanc (seuil 170), en noir sur fond blanc. */
     WHITE170,
+
     /** Idem, seuil 200. */
     WHITE200,
 }
@@ -32,10 +38,12 @@ interface Pixels {
     fun fraction(left: Int, top: Int, right: Int, bottom: Int, test: (r: Int, g: Int, b: Int) -> Boolean): Double {
         var tot = 0
         var hit = 0
-        for (y in maxOf(0, top) until minOf(height, bottom) step 2) for (x in maxOf(0, left) until minOf(width, right) step 2) {
-            val c = rgb(x, y)
-            tot++
-            if (test((c shr 16) and 255, (c shr 8) and 255, c and 255)) hit++
+        for (y in maxOf(0, top) until minOf(height, bottom) step 2) {
+            for (x in maxOf(0, left) until minOf(width, right) step 2) {
+                val c = rgb(x, y)
+                tot++
+                if (test((c shr 16) and 255, (c shr 8) and 255, c and 255)) hit++
+            }
         }
         return if (tot == 0) 0.0 else hit.toDouble() / tot
     }
@@ -50,6 +58,9 @@ interface Screen {
     val pixels: Pixels
     suspend fun ocr(req: CropRequest): OcrPage
 }
+
+/** Lit toutes les zones en parallèle (résultats dans l'ordre de [reqs]) ; l'écran limite lui-même le nombre de lectures simultanées. */
+suspend fun Screen.ocrAll(reqs: List<CropRequest>): List<OcrPage> = coroutineScope { reqs.map { async { ocr(it) } }.awaitAll() }
 
 /** Ramène une page lue sur une zone agrandie en coordonnées de la capture. */
 fun OcrPage.fromCrop(req: CropRequest, full: OcrPage): OcrPage {

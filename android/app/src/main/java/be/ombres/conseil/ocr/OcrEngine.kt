@@ -17,9 +17,11 @@ object OcrEngine {
             .addOnSuccessListener { text ->
                 val lines = mutableListOf<OcrLine>()
                 val elements = mutableListOf<OcrLine>()
-                for (block in text.textBlocks) for (line in block.lines) {
-                    line.boundingBox?.let { lines.add(OcrLine(line.text, it.left, it.top, it.right, it.bottom)) }
-                    for (e in line.elements) e.boundingBox?.let { elements.add(OcrLine(e.text, it.left, it.top, it.right, it.bottom)) }
+                for (block in text.textBlocks) {
+                    for (line in block.lines) {
+                        line.boundingBox?.let { lines.add(OcrLine(line.text, it.left, it.top, it.right, it.bottom)) }
+                        for (e in line.elements) e.boundingBox?.let { elements.add(OcrLine(e.text, it.left, it.top, it.right, it.bottom)) }
+                    }
                 }
                 cont.resume(OcrPage(bitmap.width, bitmap.height, lines, elements))
             }

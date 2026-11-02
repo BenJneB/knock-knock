@@ -17,13 +17,21 @@ kotlin {
                 output?.library = "conseil"
                 output?.libraryTarget = "umd"
             }
+            // Les tests JavaScript passent par Node (ci-dessous) : pas besoin de navigateur.
+            testTask { enabled = false }
         }
+        nodejs()
         binaries.executable()
     }
 
     sourceSets {
-        jsMain.dependencies {
-            // Lecture d'une capture dans la page : appels asynchrones vers Tesseract.js (promesses).
+        // Tests communs : exécutés sur la JVM et en JavaScript (Node), pour vérifier que les deux plateformes
+        // lisent et calculent pareil (expressions régulières, nombres…).
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+        // Lecture d'une capture : zones lues en parallèle (ML Kit sur Android, Tesseract.js dans la page, via des promesses).
+        commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
         }
         jvmMain.dependencies {
@@ -52,6 +60,7 @@ val webPage by tasks.registering {
     outputs.files(pages.values.map { web.resolve("dist/$it") })
     doLast {
         val engine = js.get().asFile.readText().trim()
+
         // Inclusion : le moteur compilé, ou un fichier de web/src/ (commun/script.js, zone-sombre/script.js…).
         fun part(name: String) = if (name == "engine.js") engine
         else web.resolve("src/$name").takeIf { it.isFile }?.readText()?.trimEnd() ?: error("Inclusion inconnue « $name »")

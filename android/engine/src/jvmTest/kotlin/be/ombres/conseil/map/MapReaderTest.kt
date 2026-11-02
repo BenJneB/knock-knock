@@ -1,5 +1,6 @@
 package be.ombres.conseil.map
 
+import be.ombres.conseil.game.RoomType
 import be.ombres.conseil.ocr.Pixels
 import be.ombres.conseil.ocr.RecordedScreen
 import kotlinx.coroutines.runBlocking
@@ -124,6 +125,49 @@ class MapReaderTest {
             ).sortedBy { it.toString() },
             rooms(r),
         )
+    }
+
+    /** Match de Défense de la capitale : types de salles (couleur du sol) et bonus « 50% ». */
+    @Test
+    fun capitale() {
+        val r = read("exemple-ecran-capitale")
+        assertEquals(listOf("s43-Nexus", "s40-Ombres", "s42-44"), r.guilds.map { it.name })
+        assertEquals(listOf("864.6K", "417.72K", "229.8K"), r.guilds.map { it.soul })
+        assertEquals(listOf("50", "24", "18"), r.guilds.map { it.rate })
+        assertEquals(listOf(3, 2, 1), r.guilds.map { it.rooms })
+        assertEquals(5 to 10, r.hours to r.minutes)
+        val I = RoomType.INTERMEDIATE
+        assertEquals(
+            listOf(
+                listOf(0, null, RoomType.SUPREME, false), // DMG caché par un personnage
+                listOf(0, "506.19M", I, true),
+                listOf(0, "606.09M", I, false),
+                listOf(1, "2.02B", I, false),
+                listOf(1, "355.06M", I, false),
+                listOf(2, "791.65M", I, true), // nom « 44 » illisible : attribuée par élimination
+            ).sortedBy { it.toString() },
+            r.rooms.map { listOf(it.guild, it.dmg, it.type, it.buff) }.sortedBy { it.toString() },
+        )
+        assertEquals(
+            listOf(listOf("2", RoomType.BASIC), listOf("2", RoomType.BASIC), listOf("2", RoomType.BASIC), listOf("2", RoomType.BASIC), listOf("4", I)),
+            r.free.map { listOf(it.rate, it.type) }.sortedBy { it.toString() },
+        )
+    }
+
+    /** Salle basique occupée (Noxia : « 1 verte, 1 violette » dans le bandeau). */
+    @Test
+    fun roomTypesInZoneSombre() {
+        val r = read("situation2")
+        assertEquals(listOf(RoomType.BASIC, RoomType.INTERMEDIATE), r.rooms.filter { it.guild == 0 }.map { it.type }.sortedBy { it!!.ordinal })
+        assertEquals(RoomType.SUPREME, r.rooms.single { it.dmg == "2.91B" }.type)
+        assertEquals(true, r.rooms.single { it.dmg == "3.02B" }.buff) // badge repéré à sa couleur (texte illisible)
+    }
+
+    /** Bonus « 50% » : lus comme texte ou repérés à leur couleur ; ceux sous une bulle de bouclier restent manqués. */
+    @Test
+    fun buffBadges() {
+        val r = read("situation3")
+        assertEquals(listOf("355.18M", "57.45B", "863.28M"), r.rooms.filter { it.buff }.map { it.dmg }.sortedBy { it })
     }
 
     @Test

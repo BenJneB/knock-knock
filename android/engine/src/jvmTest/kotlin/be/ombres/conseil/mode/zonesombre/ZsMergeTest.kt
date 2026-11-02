@@ -1,7 +1,11 @@
 package be.ombres.conseil.mode.zonesombre
 
-import be.ombres.conseil.map.*
-import be.ombres.conseil.game.*
+import be.ombres.conseil.game.GuildIn
+import be.ombres.conseil.map.FreeRoom
+import be.ombres.conseil.map.GuildRead
+import be.ombres.conseil.map.MapReading
+import be.ombres.conseil.map.RoomRead
+import be.ombres.conseil.map.ScreenKind
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

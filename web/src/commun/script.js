@@ -3,6 +3,8 @@
  * petits utilitaires d'affichage et lecture d'une capture dans le navigateur avec Tesseract.js.
  * Le lecteur et le moteur sont ceux de l'appli (module android/engine, intégré dans chaque page).
  */
+// Définis par la page (STORE, DEF, st) ou chargés avant ce script (moteur « conseil », Tesseract.js).
+/* global STORE, DEF, st:writable, conseil, Tesseract */
 const $ = s => document.querySelector(s);
 
 // Pastille de coût, avec l'icône des cartes citées (« 1 Sanctuaire sacré + 1 Esprit malveillant »).
@@ -48,6 +50,15 @@ function drawFields(keys){
 }
 
 $("#reset").onclick = () => { if (!confirm("Effacer toutes les valeurs ?")) return; st = structuredClone(DEF); save(); location.reload(); };
+
+/* ---------- salles : type et bonus ---------- */
+/** Champs « Type » et « Bonus 50% » d'une salle (data-k="type", data-k="buff" : "1" ou vide). */
+function roomKindHtml(){
+  return `
+         <div><label>Type</label><select data-k="type"><option value="">?</option><option value="BASIC">basique</option>
+           <option value="INTERMEDIATE">intermédiaire</option><option value="SUPREME">suprême</option></select></div>
+         <div><label>Bonus 50%</label><select data-k="buff"><option value="">Non</option><option value="1">Oui</option></select></div>`;
+}
 
 /* ---------- affichage du plan ---------- */
 /** Affiche les valeurs manquantes ; vrai s'il y en a. */

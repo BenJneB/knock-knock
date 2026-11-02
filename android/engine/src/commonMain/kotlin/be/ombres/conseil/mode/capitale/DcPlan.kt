@@ -1,6 +1,7 @@
 package be.ombres.conseil.mode.capitale
 
 import be.ombres.conseil.game.GuildIn
+import be.ombres.conseil.game.RoomType
 import be.ombres.conseil.game.Step
 import be.ombres.conseil.game.dur
 import be.ombres.conseil.game.fmt
@@ -19,8 +20,14 @@ import be.ombres.conseil.ocr.fold
  * Pas de cartes d'exorcisme dans ce mode.
  */
 
-/** Salle vue sur la carte : salle d'une autre guilde ([owner], record [dmg]) ou salle libre (owner vide, efficacité [rate]). */
-data class DcRoom(val n: String = "", val owner: String = "", val dmg: String = "", val rate: String = "")
+/**
+ * Salle vue sur la carte : salle d'une autre guilde ([owner], record [dmg]) ou salle libre (owner vide, efficacité
+ * [rate] d'un joueur). [type] : nom d'un [RoomType] (vide si inconnu) ; [buff] : bonus « 50% ».
+ */
+data class DcRoom(
+    val n: String = "", val owner: String = "", val dmg: String = "", val rate: String = "",
+    val type: String = "", val buff: Boolean = false,
+)
 
 data class DcInput(
     val guilds: List<GuildIn> = listOf(GuildIn(n = "s40-Ombres"), GuildIn(), GuildIn()),
@@ -67,6 +74,10 @@ fun guildIndex(owner: String, guilds: List<GuildIn>): Int? {
 
 private class Option(val room: DcRoom, val owner: Int?, val gain: Double, val loss: Double)
 
+/** Type d'une salle libre d'après l'efficacité d'un joueur (2, 4, 8 /s ; ×1,5 avec bonus) si la couleur n'a rien dit. */
+private fun freeType(room: DcRoom, rate: Double): RoomType? = RoomType.of(room.type)
+    ?: RoomType.entries.firstOrNull { it.perPlayer == rate || it.perPlayer * RoomType.BUFF == rate }
+
 fun dcPlan(st: DcInput): DcResult {
     val names = st.guilds.map { it.n.ifEmpty { "?" } }
     val souls = st.guilds.map { parseNum(it.a) }
@@ -90,7 +101,9 @@ fun dcPlan(st: DcInput): DcResult {
     val pos = order.indexOf(st.me)
     val target = order.getOrNull(pos - 1) ?: order.getOrNull(pos + 1)
 
-    fun roomValue(g: Int): Double {
+    // Production d'une salle : pleine selon son type et son bonus ; sinon, moyenne des salles de la guilde.
+    fun roomValue(g: Int, room: DcRoom? = null): Double {
+        RoomType.of(room?.type)?.let { return it.full(room!!.buff) }
         val count = int(st.guilds[g].s).takeIf { it > 0 } ?: st.rooms.count { guildIndex(it.owner, st.guilds) == g }.coerceAtLeast(1)
         return rates[g]!! / count
     }
@@ -98,21 +111,39 @@ fun dcPlan(st: DcInput): DcResult {
     val options = st.rooms.mapNotNull { room ->
         if (room.owner.isEmpty()) {
             val rate = parseNum(room.rate) ?: return@mapNotNull null
-            Option(room, null, rate * T, 0.0)
+            // Production d'un joueur × lits : d'autres joueurs y vont au lit sans tentative.
+            Option(room, null, rate * (freeType(room, rate)?.beds ?: 1) * T, 0.0)
         } else {
             val g = guildIndex(room.owner, st.guilds) ?: return@mapNotNull null
             if (g == st.me || rates[g] == null) return@mapNotNull null
             val dmg = parseNum(room.dmg)
+            if (ourDmg != null && dmg == null) return@mapNotNull null // record illisible : signalé plus bas
             if (ourDmg != null && dmg != null && dmg >= ourDmg) return@mapNotNull null // record trop haut
-            val v = roomValue(g) * T
+            val v = roomValue(g, room) * T
             Option(room, g, v, if (g == target) v else 0.0)
         }
     }.sortedByDescending { it.gain + it.loss }
 
+    // Lits de nos salles : capacité d'après leur type, comparée à notre production actuelle.
+    val ourTypes = st.ourRooms.map { RoomType.of(it.type) to it.buff }
+    val capacity = if (ourTypes.isNotEmpty() && ourTypes.all { it.first != null }) ourTypes.sumOf { (t, b) -> t!!.full(b) } else null
+    val missingRate = capacity?.let { (it - rates[st.me]!!).coerceAtLeast(0.0) }
+    val bedsDetail = when {
+        capacity == null -> "Les joueurs sans salle d’abord."
+
+        missingRate!! < 1 -> "Vos salles semblent pleines (${fmt(rates[st.me]!!)}/s sur ${fmt(capacity)}/s possibles)."
+
+        else -> {
+            val perPlayer = ourTypes.sumOf { (t, b) -> t!!.full(b) } / ourTypes.sumOf { (t, _) -> t!!.beds }
+            val players = kotlin.math.round(missingRate / perPlayer).toInt().coerceAtLeast(1)
+            "Il manque environ $players joueur(s) dans vos salles : ${fmt(rates[st.me]!!)}/s sur ${fmt(capacity)}/s possibles (+${fmt(missingRate)}/s)."
+        }
+    }
+    if (missingRate != null && missingRate >= 1) final[st.me] = final[st.me]!! + missingRate * T
     val steps = mutableListOf(
         Step(
             "Remplir les lits de vos salles",
-            "Aller au lit dans une salle de votre guilde ne coûte aucune tentative, et chaque joueur présent produit l’efficacité de la salle. Les joueurs sans salle d’abord.",
+            "Aller au lit dans une salle de votre guilde ne coûte aucune tentative, et chaque joueur présent produit l’efficacité de la salle. $bedsDetail",
             "",
         )
     )
@@ -120,13 +151,16 @@ fun dcPlan(st: DcInput): DcResult {
     val chosen = options.take(budget)
     for (o in chosen) {
         final[st.me] = final[st.me]!! + o.gain
-        if (o.owner != null) final[o.owner] = final[o.owner]!! - roomValue(o.owner) * T
+        if (o.owner != null) final[o.owner] = final[o.owner]!! - roomValue(o.owner, o.room) * T
         if (o.owner == null) {
-            steps.add(Step("Occuper la salle libre ${o.room.n}", "Un défi suffit (${o.room.rate}/s par joueur) ; d’autres joueurs peuvent ensuite y aller au lit sans tentative.", "1 tentative"))
+            val beds = freeType(o.room, parseNum(o.room.rate)!!)?.beds
+            val fill = if (beds != null) "; puis $beds joueurs au total y vont au lit sans tentative" else "; d’autres joueurs peuvent ensuite y aller au lit sans tentative"
+            steps.add(Step("Occuper la salle libre ${o.room.n}", "Un défi suffit (${o.room.rate}/s par joueur$fill).", "1 tentative"))
         } else {
             val who = short(names[o.owner])
             val need = if (o.room.dmg.isNotEmpty()) "Record de défense ${o.room.dmg} : envoyez un joueur qui inflige plus de ${o.room.dmg}. " else ""
-            val effect = if (o.loss > 0) "Vous gagnez sa production et $who la perd." else "Vous gagnez sa production."
+            val worth = RoomType.of(o.room.type)?.let { t -> " (salle ${t.label}${if (o.room.buff) " avec bonus" else ""} : ${fmt(t.full(o.room.buff))}/s pleine)" } ?: ""
+            val effect = (if (o.loss > 0) "Vous gagnez sa production et $who la perd" else "Vous gagnez sa production") + "$worth."
             steps.add(Step("Défier ${o.room.n} ($who)", need + effect, "1 tentative"))
         }
     }
@@ -146,6 +180,9 @@ fun dcPlan(st: DcInput): DcResult {
     val unused = (budget - chosen.size).coerceAtLeast(0)
     if (unused > 0 && options.size < budget) defense.add("$unused tentative(s) sans cible utile : inutile de jouer les tentatives payantes.")
     if (ourDmg == null && st.rooms.any { it.owner.isNotEmpty() }) defense.add("Indiquez le meilleur DMG de vos joueurs pour écarter les salles impossibles à prendre.")
+    if (ourDmg != null) st.rooms.filter { it.owner.isNotEmpty() && it.dmg.isEmpty() }.forEach {
+        defense.add("Record illisible pour ${it.n} (${it.owner}) : vérifiez-le dans le jeu avant de la défier.")
+    }
 
     return DcOk(T, before, ranking(), steps, defense, unused)
 }
